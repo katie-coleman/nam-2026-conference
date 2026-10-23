@@ -277,7 +277,7 @@ test.describe('Ended sessions', () => {
       const { day, an, bn } = await open(page, request);
       await pill(page, an).click();
       await pill(page, bn).click();
-      await expect(page.getByRole('button', { name: 'Grid' })).toBeDisabled();
+      await expect(page.locator('button[title^="Grid shows a whole day"]')).toBeDisabled();
       await expect(page.getByTestId('grid-blocked-notice')).toBeVisible();
 
       await expect(pill(page, 'All')).toHaveAttribute('aria-pressed', 'false');

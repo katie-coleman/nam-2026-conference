@@ -29,7 +29,7 @@ and a bound `?` to `args`:
 | param | clause |
 | --- | --- |
 | `day` | `s.day = ?` |
-| `trackSlug` | `t.slug = ?` |
+| `trackSlug` | `t.slug IN (?, …)` — comma-separated, trimmed, empties dropped |
 | `venueId` / `roomId` | `v.id = ?` / `r.id = ?` |
 | `level` / `format` | `s.level = ?` / `s.format = ?` |
 | `q` | `LIKE %q%` on title, abstract, subtitle, or any speaker name (`EXISTS`) |
@@ -59,6 +59,7 @@ and writes with `{ replace: true }`; `clearAll` keeps `day` and an explicit `vie
 The empty state's heading is `No sessions match`, followed by the search text in curly quotes when `q` is set.
 
 **Grid vs list.** `requestedView = ?view ?? (useMediaQuery('(min-width: 1024px)') ? 'grid' : 'list')`.
+The track pills are multi-select toggles (`toggleTrack`, `aria-pressed`; `All` clears) over the comma string in `filters.track`.
 `BLOCKERS` is `[key, human phrase]` for `q`, `track`, `tag`, `level`, `format`;
 `blocker` is the first active one. With a blocker, `view` is forced to `'list'`,
 the Grid tab is `disabled` with a `title` naming the blocker, and

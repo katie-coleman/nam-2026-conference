@@ -199,3 +199,17 @@ describe('Every endpoint answers', () => {
     assert.deepEqual(missing, [], `untested endpoints: ${missing.join(', ')}`);
   });
 });
+
+describe('A comma-separated trackSlug', () => {
+  const idsOf = async (query) => (await api.json(`/sessions?${query}`)).map((s) => s.id).sort();
+
+  test('returns the union of the tracks, and one slug is unchanged', async () => {
+    const [a, b] = (await api.json('/bootstrap')).tracks.map((t) => t.slug);
+    const onlyA = await idsOf(`trackSlug=${a}`);
+    const onlyB = await idsOf(`trackSlug=${b}`);
+    assert.ok(onlyA.length > 0 && onlyB.length > 0);
+    assert.deepEqual(await idsOf(`trackSlug=${a},${b}`), [...new Set([...onlyA, ...onlyB])].sort());
+    assert.deepEqual(await idsOf(`trackSlug=${a},`), onlyA);
+    assert.deepEqual(await idsOf(`trackSlug=${a},nope`), onlyA);
+  });
+});

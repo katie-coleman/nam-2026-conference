@@ -232,4 +232,60 @@ test.describe('Ended sessions', () => {
     await expect(page).toHaveURL(/track=/);
     for (const l of ['Venue', 'Level', 'Format', 'Topic']) await expect(page.getByLabel(l)).toBeVisible();
   });
+
+  test.describe('multi-select track filter', () => {
+    const count = async (request, query) => (await (await request.get(`${API}/sessions?${query}`)).json()).length;
+    const shown = (n) => new RegExp(`^${n} sessions?$`);
+    const pill = (page, name) => page.getByRole('button', { name, exact: true });
+
+    async function open(page, request) {
+      const day = (await conferenceDays())[1];
+      const tracks = (await (await request.get(`${API}/bootstrap`)).json()).tracks.slice(0, 2);
+      await visit(page, `/schedule?day=${day}&view=list`, { at: await momentOn(0, MID_SESSION_TIME) });
+      await waitForResults(page);
+      const filters = page.getByRole('button', { name: /^Filters/ });
+      if (await filters.isVisible()) await filters.click();
+      const names = tracks.map((t) => t.shortName ?? t.name);
+      return { day, a: tracks[0].slug, b: tracks[1].slug, an: names[0], bn: names[1] };
+    }
+
+    test('selecting two tracks shows both, deselecting one leaves the other', async ({ page, request }) => {
+      const { day, a, b, an, bn } = await open(page, request);
+      const all = await count(request, `day=${day}`);
+      await expect(pill(page, an)).toHaveAttribute('aria-pressed', 'false');
+
+      await pill(page, an).click();
+      await expect(pill(page, an)).toHaveAttribute('aria-pressed', 'true');
+      await pill(page, bn).click();
+      await expect(page).toHaveURL(new RegExp(`track=${a}%2C${b}|track=${a},${b}`));
+      const both = await count(request, `day=${day}&trackSlug=${a},${b}`);
+      expect(both).toBeGreaterThan(await count(request, `day=${day}&trackSlug=${a}`));
+      await expect(page.getByTestId('result-count')).toHaveText(shown(both));
+      await shotForPR(page, 'two tracks selected');
+
+      await pill(page, an).click();
+      await expect(pill(page, an)).toHaveAttribute('aria-pressed', 'false');
+      await expect(page).toHaveURL(new RegExp(`track=${b}(&|$)`));
+      await expect(page.getByTestId('result-count')).toHaveText(shown(await count(request, `day=${day}&trackSlug=${b}`)));
+
+      await pill(page, bn).click();
+      await expect(page).not.toHaveURL(/track=/);
+      await expect(page.getByTestId('result-count')).toHaveText(shown(all));
+    });
+
+    test('All clears every selected track and Grid stays blocked meanwhile', async ({ page, request }) => {
+      const { day, an, bn } = await open(page, request);
+      await pill(page, an).click();
+      await pill(page, bn).click();
+      await expect(page.locator('button[title^="Grid shows a whole day"]')).toBeDisabled();
+      await expect(page.getByTestId('grid-blocked-notice')).toBeVisible();
+
+      await expect(pill(page, 'All')).toHaveAttribute('aria-pressed', 'false');
+      await pill(page, 'All').click();
+      await expect(page).not.toHaveURL(/track=/);
+      await expect(pill(page, 'All')).toHaveAttribute('aria-pressed', 'true');
+      await expect(pill(page, an)).toHaveAttribute('aria-pressed', 'false');
+      await expect(page.getByTestId('result-count')).toHaveText(shown(await count(request, `day=${day}`)));
+    });
+  });
 });

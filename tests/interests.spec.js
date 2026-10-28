@@ -70,6 +70,8 @@ test.describe('Interests', () => {
     };
     const order = () => dialog.getByRole('checkbox').evaluateAll((els) => els.map((e) => e.dataset.testid));
     const boxes = async () => {
+      // the panel rises in on open; measure once it has settled
+      await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => a.effect.getComputedTiming().iterations !== Infinity).map((a) => a.finished.catch(() => {}))));
       const out = {};
       for (const t of topics) out[t.slug] = await page.getByTestId(`interest-${t.slug}`).boundingBox();
       out.save = await page.getByTestId('interests-save').boundingBox();

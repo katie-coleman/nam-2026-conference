@@ -7,9 +7,12 @@ files:
   - server/routes/users.js
   - src/components/SeatPanel.jsx
   - src/components/ConflictDialog.jsx
+  - src/components/InterestsDialog.jsx
 tests:
   - tests/api/seats.test.js
   - tests/api/overlap.test.js
+  - tests/api/interests.test.js
+  - tests/interests.spec.js
   - tests/seats.spec.js
 related: [attendance, agenda, clock, architecture, testing]
 ---
@@ -63,7 +66,14 @@ logic lives elsewhere: `GET /` and `GET /:id` (the user plus `followedSpeakers`,
 `GET /:id/schedule` (`lib/agenda.js:todayFor`/`scheduleFor`, see the agenda
 doc); attendance, check-in and rating routes (see the attendance doc); and
 `PUT`/`DELETE /:id/follows/:speakerId`, which write `speaker_follows` directly
-through the module-scope `follow`/`unfollow` statements.
+through the module-scope `follow`/`unfollow` statements; and
+`PUT /:id/interests` body `{interests: string[]}` of topic tag names
+(`tags.kind = 'topic'`) — 404 unknown user, **400** for a non-array or any
+name that is not a topic tag, `[]` clears; stores them de-duplicated and
+comma-joined in `users.interests`, returns `toUser`. The client side is
+`api.saveInterests` and `useConference().saveInterests(names)` (patches
+`data.users`, so `currentUser.interests` is live; toasts and returns false on
+failure), used by `InterestsDialog` (see the ui doc).
 
 **Client.** `src/lib/api.js:reserveSeat(userId, sessionId, now)` PUTs `now` as
 the body; `api()` throws on non-2xx but keeps `err.status` and `err.payload`.

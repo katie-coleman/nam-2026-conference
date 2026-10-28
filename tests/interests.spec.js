@@ -54,4 +54,61 @@ test.describe('Interests', () => {
       await request.put(`${API}/users/${user}/interests`, { data: { interests: original } });
     }
   });
+
+  test('ticking a topic moves and resizes nothing, and the order never changes', async ({ page, request }, testInfo) => {
+    const { user } = await laneFor('interests.layout', testInfo);
+    const at = await momentOn(0, '07:00');
+    const bootstrap = await (await request.get(`${API}/bootstrap`)).json();
+    const topics = bootstrap.tags.filter((t) => t.kind === 'topic');
+    const original = (await (await request.get(`${API}/users/${user}`)).json()).interests;
+    const dialog = page.getByTestId('interests-dialog');
+
+    const open = async () => {
+      await page.getByRole('button', { name: /Switch attendee/ }).click();
+      await page.getByTestId('open-interests').click();
+      await expect(dialog).toBeVisible();
+    };
+    const order = () => dialog.getByRole('checkbox').evaluateAll((els) => els.map((e) => e.dataset.testid));
+    const boxes = async () => {
+      const out = {};
+      for (const t of topics) out[t.slug] = await page.getByTestId(`interest-${t.slug}`).boundingBox();
+      out.save = await page.getByTestId('interests-save').boundingBox();
+      out.cancel = await dialog.getByRole('button', { name: 'Cancel' }).boundingBox();
+      return out;
+    };
+    const expected = topics.map((t) => `interest-${t.slug}`);
+
+    try {
+      await request.put(`${API}/users/${user}/interests`, { data: { interests: [] } });
+      await visit(page, '/', { as: user, at });
+      await open();
+      expect(await order()).toEqual(expected);
+      const before = await boxes();
+
+      const first = page.getByTestId(`interest-${topics[0].slug}`);
+      const borderOff = await first.evaluate((e) => getComputedStyle(e).borderColor);
+      await first.click();
+      await expect(first).toHaveAttribute('aria-checked', 'true');
+      expect(await first.evaluate((e) => getComputedStyle(e).borderColor)).not.toBe(borderOff);
+      await shotForPR(page, 'Interests dialog with a topic ticked, nothing moved');
+      expect(await boxes()).toEqual(before);
+      expect(await order()).toEqual(expected);
+
+      await first.click();
+      await expect(first).toHaveAttribute('aria-checked', 'false');
+      expect(await boxes()).toEqual(before);
+
+      // save a tick, reload, reopen: same order, same layout
+      await page.getByTestId(`interest-${topics[1].slug}`).click();
+      await page.getByTestId('interests-save').click();
+      await expect(dialog).toBeHidden();
+      await visit(page, '/', { as: user, at });
+      await open();
+      expect(await order()).toEqual(expected);
+      await expect(page.getByTestId(`interest-${topics[1].slug}`)).toHaveAttribute('aria-checked', 'true');
+      expect(await boxes()).toEqual(before);
+    } finally {
+      await request.put(`${API}/users/${user}/interests`, { data: { interests: original } });
+    }
+  });
 });

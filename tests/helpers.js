@@ -134,6 +134,7 @@ export const LANES = {
   // smoke.spec.js's "no session in the future carries a rating".
   // Only edits interests; no seat is booked and nothing is attended, so it shares any day.
   'interests.menu': { desktop: { user: marcus, day: 3, agenda: false }, mobile: { user: kenji, day: 3, agenda: false } },
+  'interests.layout': { desktop: { user: sofia, day: 3, agenda: false }, mobile: { user: jonas, day: 3, agenda: false } },
   'attendance.rating-toast':  { desktop: { user: marcus, day: 0, slot: '09:00', agenda: false }, mobile: { user: abraham, day: 0, slot: '09:00', agenda: false } },
 };
 

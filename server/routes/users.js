@@ -24,6 +24,8 @@ const myCheckIns = db.prepare('SELECT session_id FROM check_ins WHERE user_id = 
 const myRatings = db.prepare('SELECT session_id, stars FROM ratings WHERE user_id = ?');
 const follow = db.prepare('INSERT OR IGNORE INTO speaker_follows (user_id, speaker_id) VALUES (?, ?)');
 const unfollow = db.prepare('DELETE FROM speaker_follows WHERE user_id = ? AND speaker_id = ?');
+const topicTags = db.prepare("SELECT name FROM tags WHERE kind = 'topic'");
+const setInterests = db.prepare('UPDATE users SET interests = ? WHERE id = ?');
 
 /** Sessions this user is presenting, if their account is linked to a speaker. */
 const speakingSessions = (speakerId) =>
@@ -150,6 +152,18 @@ usersRouter.put('/:id/follows/:speakerId', (req, res) => {
   }
   follow.run(req.params.id, req.params.speakerId);
   res.json({ following: true, speakerId: Number(req.params.speakerId) });
+});
+
+/** Replace this attendee's interests. Only topic tag names may be saved; [] clears them. */
+usersRouter.put('/:id/interests', (req, res) => {
+  if (!userExists.get(req.params.id)) return res.status(404).json({ error: 'Attendee not found' });
+  const { interests } = req.body ?? {};
+  const topics = new Set(topicTags.all().map((t) => t.name));
+  if (!Array.isArray(interests) || !interests.every((n) => typeof n === 'string' && topics.has(n))) {
+    return res.status(400).json({ error: 'interests must be a list of topic tag names' });
+  }
+  setInterests.run([...new Set(interests)].join(','), req.params.id);
+  res.json(toUser(getUser.get(req.params.id)));
 });
 
 usersRouter.delete('/:id/follows/:speakerId', (req, res) => {

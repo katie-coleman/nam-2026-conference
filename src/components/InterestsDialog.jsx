@@ -93,7 +93,8 @@ export function InterestsDialog({ open, onClose }) {
                   on ? 'border-violet-400/50 bg-violet-500/15 text-violet-200' : 'border-hairline text-muted hover:bg-raised',
                 )}
               >
-                {on && <Icon name="check" className="size-3" />}
+                {/* Always rendered so a button is the same size ticked or not. */}
+                <Icon name="check" className={cx('size-3', !on && 'invisible')} />
                 {t.name}
               </button>
             );

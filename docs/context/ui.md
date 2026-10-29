@@ -146,7 +146,7 @@ sticky `glass` header, `<main id="main">`, and the footer.
   without taking header space. Above them an "Interests" row
   (`data-testid="open-interests"`) closes the menu and opens `InterestsDialog`
   (`interests-dialog`): every `kind === 'topic'` tag from `useConference().tags`
-  as a `role="checkbox"` button (`interest-<slug>`), `interests-save`; portalled to
+  as a `role="checkbox"` button (`interest-<slug>`; its size is the same ticked or not, the check icon's space is always reserved), `interests-save`; portalled to
   `<body>` because the `glass` header would contain a `fixed` child; the draft
   resets from `currentUser.interests` on open, and a save toasts "Interests saved". Each row shows "N on agenda"; every row but the signed-in
   attendee's reads `u.reservedCount` from `/bootstrap` (frozen at load), but

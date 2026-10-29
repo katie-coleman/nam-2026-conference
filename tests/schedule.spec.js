@@ -25,7 +25,9 @@ test.describe('Schedule', () => {
   test('track chips pick several tracks, and the choice lives in the URL', async ({ page, request }, testInfo) => {
     const { user, day } = await laneFor('schedule.tracks', testInfo);
     const at = await momentOn(0, MID_SESSION_TIME);
-    const [a, b] = (await (await request.get(`${API}/bootstrap`)).json()).tracks.map((t) => t.slug);
+    // two tracks that both run something on this day
+    const onDay = await (await request.get(`${API}/sessions?day=${day}`)).json();
+    const [a, b] = [...new Set(onDay.map((x) => x.track.slug))];
     const count = async (qs) => (await (await request.get(`${API}/sessions?day=${day}${qs}`)).json()).length;
     const [all, onlyA, onlyB, both] = [await count(''), await count(`&trackSlug=${a}`), await count(`&trackSlug=${b}`), await count(`&trackSlug=${a},${b}`)];
     const chip = (slug) => page.getByTestId(`track-chip-${slug}`);

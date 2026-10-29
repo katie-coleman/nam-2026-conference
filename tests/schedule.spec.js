@@ -22,6 +22,60 @@ test.describe('Schedule', () => {
     await expect(rail).not.toContainText('today');
   });
 
+  test('track chips pick several tracks, and the choice lives in the URL', async ({ page, request }, testInfo) => {
+    const { user, day } = await laneFor('schedule.tracks', testInfo);
+    const at = await momentOn(0, MID_SESSION_TIME);
+    // two tracks that both run something on this day
+    const onDay = await (await request.get(`${API}/sessions?day=${day}`)).json();
+    const [a, b] = [...new Set(onDay.map((x) => x.track.slug))];
+    const count = async (qs) => (await (await request.get(`${API}/sessions?day=${day}${qs}`)).json()).length;
+    const [all, onlyA, onlyB, both] = [await count(''), await count(`&trackSlug=${a}`), await count(`&trackSlug=${b}`), await count(`&trackSlug=${a},${b}`)];
+    const chip = (slug) => page.getByTestId(`track-chip-${slug}`);
+    const results = page.getByTestId('result-count');
+    const expectCount = async (n) => { await waitForResults(page); await expect(results).toHaveText(new RegExp(`^${n} sessions?\\b`)); };
+    const openRail = async () => {
+      const filters = page.getByRole('button', { name: /^Filters/ });
+      if (await filters.isVisible() && !(await chip(a).isVisible())) await filters.click();
+    };
+
+    expect(both).toBeGreaterThan(onlyA);
+    await visit(page, `/schedule?view=list&day=${day}`, { as: user, at });
+    await openRail();
+    await expectCount(all);
+    await expect(page.getByTestId('track-chip-all')).toHaveAttribute('aria-pressed', 'true');
+
+    await chip(a).click();
+    await expectCount(onlyA);
+    await chip(b).click();
+    await expect(chip(a)).toHaveAttribute('aria-pressed', 'true');
+    await expect(chip(b)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('track-chip-all')).toHaveAttribute('aria-pressed', 'false');
+    await expectCount(both);
+    await expect(page).toHaveURL(new RegExp(`track=${a}(,|%2C)${b}`));
+    await shotForPR(page, 'two tracks ticked, the list showing both');
+
+    await page.reload();
+    await openRail();
+    await expect(chip(a)).toHaveAttribute('aria-pressed', 'true');
+    await expect(chip(b)).toHaveAttribute('aria-pressed', 'true');
+    await expectCount(both);
+
+    await chip(a).click();
+    await expect(chip(a)).toHaveAttribute('aria-pressed', 'false');
+    await expectCount(onlyB);
+
+    await page.getByTestId('track-chip-all').click();
+    await expectCount(all);
+    await expect(page).not.toHaveURL(/track=/);
+
+    // an existing single-track link still works
+    await visit(page, `/schedule?view=list&day=${day}&track=${a}`, { as: user, at });
+    await openRail();
+    await expect(chip(a)).toHaveAttribute('aria-pressed', 'true');
+    await expect(chip(b)).toHaveAttribute('aria-pressed', 'false');
+    await expectCount(onlyA);
+  });
+
   test('switching day changes the results', async ({ page }) => {
     await visit(page, '/schedule?view=list');
     await waitForResults(page);

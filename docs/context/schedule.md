@@ -29,7 +29,7 @@ and a bound `?` to `args`:
 | param | clause |
 | --- | --- |
 | `day` | `s.day = ?` |
-| `trackSlug` | `t.slug = ?` |
+| `trackSlug` | `t.slug IN (?, …)` — comma-separated slugs, one is the same as before, unknown ones match nothing |
 | `venueId` / `roomId` | `v.id = ?` / `r.id = ?` |
 | `level` / `format` | `s.level = ?` / `s.format = ?` |
 | `q` | `LIKE %q%` on title, abstract, subtitle, or any speaker name (`EXISTS`) |
@@ -53,6 +53,7 @@ lists are plain `toSession` — no speakers/tags. **`/:id.ics`** is registered
 **`SchedulePage`** reads everything from `useSearchParams`:
 `day` (default `clock.day` if it is a conference day, else `days[0].date`),
 `track`, `venue` (venue id), `level`, `format`, `tag` (topic slug), `q`, `view`.
+`track` holds comma-separated slugs (`?track=a,b`); the track chips (`track-chip-<slug>`, `track-chip-all`) are toggles with `aria-pressed`, and **All** clears.
 Page keys map to API keys in the `useFetch` call (`track→trackSlug`,
 `venue→venueId`, `tag→tagSlug`). `set(key, value)` deletes the key for `'all'`/empty
 and writes with `{ replace: true }`; `clearAll` keeps `day` and an explicit `view`.

@@ -97,6 +97,29 @@ function filtered() {
   ];
 }
 
+describe('Track filter takes several slugs', () => {
+  const idsOf = async (qs) => (await api.json(`/sessions?${qs}`)).map((s) => s.id).sort((a, b) => a - b);
+
+  test('two slugs return the union of the two single-slug results', async () => {
+    const boot = await api.json('/bootstrap');
+    const [a, b] = boot.tracks.map((t) => t.slug);
+    const onlyA = await idsOf(`trackSlug=${a}`);
+    const onlyB = await idsOf(`trackSlug=${b}`);
+    const both = await idsOf(`trackSlug=${a},${b}`);
+    assert.ok(onlyA.length > 0 && onlyB.length > 0);
+    assert.deepEqual(both, [...new Set([...onlyA, ...onlyB])].sort((x, y) => x - y));
+    assert.ok(both.length > onlyA.length);
+  });
+
+  test('one slug is unchanged, and an unknown slug beside a real one matches nothing extra', async () => {
+    const all = await api.json('/sessions');
+    const onlyA = await api.json(`/sessions?trackSlug=${ids.track}`);
+    assert.ok(onlyA.length > 0 && onlyA.length < all.length);
+    assert.ok(onlyA.every((s) => s.track.slug === ids.track));
+    assert.deepEqual(await idsOf(`trackSlug=${ids.track},no-such-track`), await idsOf(`trackSlug=${ids.track}`));
+  });
+});
+
 describe('Every endpoint answers', () => {
   test('each read returns 200 and JSON', async () => {
     for (const path of readable()) {

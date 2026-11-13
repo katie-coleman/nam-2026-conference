@@ -233,3 +233,57 @@ test.describe('Ended sessions', () => {
     for (const l of ['Venue', 'Level', 'Format', 'Topic']) await expect(page.getByLabel(l)).toBeVisible();
   });
 });
+
+test.describe('Schedule track filter', () => {
+  test('tracks add and remove, and the count follows the API each time', async ({ page, request }) => {
+    const days = await conferenceDays();
+    const { tracks } = await (await request.get(`${API}/bootstrap`)).json();
+    const countFor = async (day, slugs) => {
+      const q = slugs.length ? `&trackSlug=${slugs.join(',')}` : '';
+      const found = await (await request.get(`${API}/sessions?day=${day}${q}`)).json();
+      return (Array.isArray(found) ? found : found.sessions).length;
+    };
+    // a day where two tracks both have sessions and the counts differ
+    let pick = null;
+    for (const day of days) {
+      const withSessions = [];
+      for (const t of tracks) if (await countFor(day, [t.slug]) > 0) withSessions.push(t);
+      if (withSessions.length >= 2) { pick = { day, a: withSessions[0], b: withSessions[1] }; break; }
+    }
+    test.skip(!pick, 'no day has two tracks with sessions');
+    const { day, a, b } = pick;
+    const name = (t) => t.shortName ?? t.name;
+
+    await visit(page, `/schedule?day=${day}&view=list`);
+    await waitForResults(page);
+    const filters = page.getByRole('button', { name: /^Filters/ });
+    if (await filters.isVisible()) await filters.click();
+    const count = page.getByTestId('result-count');
+    const expectCount = async (slugs) => {
+      const n = await countFor(day, slugs);
+      await expect(count).toHaveText(new RegExp(`^${n} session`));
+    };
+    const btnA = page.getByRole('button', { name: name(a), exact: true });
+    const btnB = page.getByRole('button', { name: name(b), exact: true });
+
+    await btnA.click();
+    await expect(btnA).toHaveAttribute('aria-pressed', 'true');
+    await expectCount([a.slug]);
+
+    await btnB.click();
+    await expect(btnB).toHaveAttribute('aria-pressed', 'true');
+    await expect(page).toHaveURL(new RegExp(`track=${a.slug}(,|%2C)${b.slug}`));
+    await expectCount([a.slug, b.slug]);
+    await shotForPR(page, 'two tracks selected in the filter rail');
+
+    await btnA.click();
+    await expect(btnA).toHaveAttribute('aria-pressed', 'false');
+    await expectCount([b.slug]);
+
+    await btnA.click();
+    await page.getByRole('button', { name: 'All', exact: true }).click();
+    await expect(page).not.toHaveURL(/track=/);
+    await expect(page.getByRole('button', { name: 'All', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expectCount([]);
+  });
+});

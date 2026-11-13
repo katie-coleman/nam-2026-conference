@@ -1,19 +1,8 @@
 import { useEffect, useState } from 'react';
-import { animate, motion } from 'motion/react';
-import { at, Show, Replay, Code, Label, Model, Kicker, Tick, Verdict, IssueIcon, PrIcon, MergeIcon, later } from './kit.jsx';
-import { Orbits } from './intro.jsx';
+import { motion } from 'motion/react';
+import { at, Show, Replay, Code, Label, Kicker, Tick, Verdict, IssueIcon, PrIcon, MergeIcon, later } from './kit.jsx';
 
-const box = 'rounded-2xl border border-hairline bg-surface';
-
-/** A number that counts up to `to` as it appears. */
-function Count({ to, prefix = '', decimals = 0, delay = 0 }) {
-  const [v, setV] = useState(0);
-  useEffect(() => {
-    const c = animate(0, to, { duration: 1.4, delay: delay / 1000, ease: [0.22, 1, 0.36, 1], onUpdate: setV });
-    return () => c.stop();
-  }, [to, delay]);
-  return <span className="tabular-nums">{prefix}{v.toFixed(decimals)}</span>;
-}
+const box = 'rounded-2xl border border-edge bg-surface';
 
 /* ------------------------------------------------------------------ *
  * When it will not converge — needs-human.
@@ -29,7 +18,7 @@ function NeedsHumanScene({ step }) {
       <Show on={step === 0} from="scale" style={at(80, 80, 1440, 520)} className="grid grid-cols-[520px_1fr] gap-10">
         <div className="relative">
           <svg viewBox="0 0 520 480" className="absolute inset-0 size-full" aria-hidden="true">
-            <circle cx="260" cy="240" r="170" fill="none" stroke="#333950" strokeWidth="3" />
+            <circle cx="260" cy="240" r="170" fill="none" stroke="#1f5c80" strokeWidth="3" />
             <circle cx="260" cy="240" r="170" pathLength="1" className="pz-flow" fill="none" stroke="#f59e0b" strokeWidth="3" />
           </svg>
           {[['🛠️ Fix', 190, 30], ['🚦 Gate', 360, 300], ['🧐 Audit', 20, 300]].map(([l, x, y]) => (
@@ -65,7 +54,7 @@ function NeedsHumanScene({ step }) {
       {/* what it leaves behind */}
       <Show on={step >= 1} from="up" style={at(80, 70, 840)} className={`${box} overflow-hidden pb-6`}>
         <div className="flex items-center gap-3 border-b border-hairline px-6 py-4">
-          <IssueIcon className="size-6 text-emerald-400" />
+          <IssueIcon className="size-6 text-teal-400" />
           <span className="font-display text-[24px] text-ink">#140 Keep sessions in view on mobile</span>
         </div>
         <div className="flex items-center gap-2 px-6 pt-4">
@@ -74,7 +63,7 @@ function NeedsHumanScene({ step }) {
           <span className="pz-pop" style={later(RELABEL_AT)}><Label name="ready-for-ai" /></span>
         </div>
         <div className="m-6 mb-4 rounded-xl border border-hairline bg-raised p-5">
-          <div className="flex items-center gap-2 text-[15px] text-faint"><span className="grid size-7 place-items-center rounded-full bg-violet-500/30 text-[14px]">🤖</span> ship · stopped at Code audit</div>
+          <div className="flex items-center gap-2 text-[15px] text-faint"><span className="grid size-7 place-items-center rounded-full bg-blue-500/30 text-[14px]">🤖</span> ship · stopped at Code audit</div>
           <div className="mt-3 text-[18px] text-ink">I could not get the first card into view on a 360 px phone without hiding the day tabs. <b>Still open:</b></div>
           <ul className="mt-2 space-y-1 text-[17px] text-muted">
             <li>• keep the day tabs visible, or collapse them behind Filters?</li>
@@ -96,7 +85,7 @@ function NeedsHumanScene({ step }) {
       </Show>
 
       <Show on={step >= 1} from="right" delay={700} style={at(960, 350, 560, 260)} className="flex flex-col justify-center gap-3">
-        <div className="pz-appear rounded-2xl border border-violet-400/50 bg-raised p-6" style={later(RELABEL_AT + 400)}>
+        <div className="pz-appear rounded-2xl border border-blue-400/50 bg-raised p-6" style={later(RELABEL_AT + 400)}>
             <div className="font-display text-[26px] text-ink">🔁 Back into ship</div>
             <div className="mt-2 text-[18px] text-muted">Relabel <Label name="ready-for-ai" className="mx-1 text-[12px]" /> and a fresh run picks up the answer, the branch and the spec.</div>
           </div>
@@ -107,14 +96,14 @@ function NeedsHumanScene({ step }) {
 
 const NEEDS_HUMAN_BEATS = [
   {
-    kicker: '4.8 · When it will not converge',
+    kicker: '4.9 · When it will not converge',
     title: 'The same finding, surviving two fixes',
     body: 'Some tickets cannot be finished by an agent — the ticket contradicts itself, or the fix needs a decision only a person can make. Ship notices it is going round in circles and stops.',
   },
   {
-    kicker: '4.8 · needs-human, then you',
-    title: 'It hands back everything it knows; you answer and relabel',
-    body: 'A draft pull request with the work so far, a comment saying exactly what is still open, and the needs-human label for the board. You make the call it could not; relabel ready-for-ai and a fresh run starts from your answer.',
+    kicker: '4.9 · needs-human, then you',
+    title: 'It hands back everything it knows; you answer and ship it again',
+    body: 'A draft pull request with the work so far, a comment saying exactly what is still open, and the needs-human label for the board. You make the call it could not, then ship it again — a fresh run starts from your answer.',
   },
 ];
 
@@ -124,8 +113,8 @@ const NEEDS_HUMAN_BEATS = [
 
 function Runner({ icon, name, file, lines, step, glow }) {
   return (
-    <div className={`overflow-hidden rounded-2xl border bg-[#0d0f15] transition-all duration-700 ${glow ? 'border-violet-400/50' : 'border-hairline'}`}>
-      <div className="flex items-center gap-3 border-b border-hairline bg-surface px-5 py-3">
+    <div className={`overflow-hidden rounded-2xl border bg-[#071322] transition-all duration-700 ${glow ? 'border-blue-400/50' : 'border-hairline'}`}>
+      <div className="flex items-center gap-3 border-b border-edge bg-surface px-5 py-3">
         <span className="text-[24px]">{icon}</span>
         <span className="font-display text-[22px] text-ink">{name}</span>
         <span className="ml-auto font-mono text-[13px] text-faint">{file}</span>
@@ -142,7 +131,7 @@ function ReviewScene({ step }) {
   return (
     <>
       <Show on={step === 0} style={at(80, 80, 380, 260)} className={`${box} p-6`}>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-[14px] font-semibold text-white"><PrIcon /> Open</span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-3 py-1 text-[14px] font-semibold text-white"><PrIcon /> Open</span>
         <div className="mt-3 font-display text-[24px] leading-tight text-ink">#142 Keep sessions in view on mobile</div>
         <div className="mt-2 text-[16px] text-muted">opened → two workflows start, side by side</div>
       </Show>
@@ -176,9 +165,9 @@ function ReviewScene({ step }) {
             <div className="mx-auto mt-2 h-1.5 w-16 rounded-full bg-overlay" />
             <div className="p-3 font-mono text-[11px] text-faint">Pixel 7 · /schedule</div>
             <div className="space-y-2 px-3">
-              <div className="flex gap-1">{[0, 1, 2, 3].map((i) => <div key={i} className="h-5 flex-1 rounded bg-violet-500/30" />)}</div>
+              <div className="flex gap-1">{[0, 1, 2, 3].map((i) => <div key={i} className="h-5 flex-1 rounded bg-blue-500/30" />)}</div>
               <div className="grid grid-cols-2 gap-1">{[0, 1, 2, 3].map((i) => <div key={i} className="h-5 rounded bg-raised" />)}</div>
-              {[0, 1, 2, 3].map((i) => <div key={i} className={`h-[60px] rounded-lg ${i === 0 ? 'bg-emerald-500/20 ring-1 ring-emerald-400/60' : 'bg-raised'}`} />)}
+              {[0, 1, 2, 3].map((i) => <div key={i} className={`h-[60px] rounded-lg ${i === 0 ? 'bg-teal-500/20 ring-1 ring-teal-400/60' : 'bg-raised'}`} />)}
             </div>
           </div>
           {[[120, 70, 400], [330, 210, 900], [700, 230, 1400], [690, 120, 1900]].map(([x, y, d], i) => (
@@ -210,13 +199,13 @@ function ReviewScene({ step }) {
 
       {/* confidence decides who reads it */}
       <Replay on={step === 2} style={at(80, 80, 1440, 520)} className="grid grid-cols-2 gap-8">
-        <div className="pz-appear flex flex-col gap-4 rounded-3xl border border-emerald-400/40 bg-emerald-500/[0.06] p-7" style={later(100)}>
-          <Kicker className="text-emerald-300">Both high</Kicker>
+        <div className="pz-appear flex flex-col gap-4 rounded-3xl border border-teal-400/40 bg-teal-500/[0.06] p-7" style={later(100)}>
+          <Kicker className="text-teal-300">Both high</Kicker>
           <Verdict pass level="high" title="Code review">Every criterion traced.</Verdict>
           <Verdict pass level="high" title="QA">Every criterion exercised, both viewports.</Verdict>
           <div className="mt-auto flex items-center gap-4">
-            <span className="grid size-14 place-items-center rounded-full bg-emerald-500/20 text-[30px]">⚡</span>
-            <div><div className="font-display text-[28px] text-emerald-200">Merge on sight</div><div className="text-[16px] text-muted">the agents could judge all of it, and found nothing</div></div>
+            <span className="grid size-14 place-items-center rounded-full bg-teal-500/20 text-[30px]">⚡</span>
+            <div><div className="font-display text-[28px] text-teal-200">Merge on sight</div><div className="text-[16px] text-muted">the agents could judge all of it, and found nothing</div></div>
           </div>
         </div>
         <div className="pz-appear flex flex-col gap-4 rounded-3xl border border-amber-400/40 bg-amber-500/[0.06] p-7" style={later(700)}>
@@ -238,7 +227,7 @@ const REVIEW_BEATS = [
   {
     kicker: '5 · After the pull request opens',
     title: 'Two more agents, on their own runners, in parallel',
-    body: 'Code review and QA start when the pull request opens, sized from facts about the diff. The reviewer reads the ticket before the code and forms its own view; every blocker must name a real path to harm and survive a skeptic.',
+    body: 'Code review and QA start when the pull request opens — in a fork, when you ask Claude; a fast run skips QA. Each is sized from the diff, and every blocker must name a real path to harm and survive a skeptic.',
   },
   {
     kicker: '5 · QA',
@@ -260,7 +249,7 @@ const REVIEW_BEATS = [
 const SPARKS = Array.from({ length: 34 }, (_, i) => {
   const a = (i / 34) * Math.PI * 2 + (i % 3) * 0.13;
   const r = 260 + ((i * 37) % 180);
-  return { x: Math.cos(a) * r, y: Math.sin(a) * r * 0.6, s: 8 + ((i * 5) % 12), c: ['bg-violet-300', 'bg-fuchsia-300', 'bg-cyan-300', 'bg-emerald-300'][i % 4] };
+  return { x: Math.cos(a) * r, y: Math.sin(a) * r * 0.6, s: 8 + ((i * 5) % 12), c: ['bg-blue-300', 'bg-cyan-300', 'bg-cyan-300', 'bg-teal-300'][i % 4] };
 });
 
 function Burst() {
@@ -289,7 +278,7 @@ function MergeScene({ step }) {
       <Show on={step === 0} from="scale" style={at(330, 90, 940, 500)} className={`${box} flex flex-col items-center justify-center p-10 text-center`}>
         {merged && <Burst />}
         <motion.div
-          className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-[20px] font-semibold text-white ${merged ? 'bg-violet-600' : 'bg-emerald-600'}`}
+          className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-[20px] font-semibold text-white ${merged ? 'bg-blue-600' : 'bg-teal-600'}`}
           animate={{ scale: merged ? [1, 1.25, 1] : 1 }}
           transition={{ duration: 0.5 }}
         >
@@ -303,14 +292,14 @@ function MergeScene({ step }) {
         <motion.button
           type="button"
           tabIndex={-1}
-          className={`relative mt-8 rounded-xl px-8 py-4 font-display text-[24px] text-white ${merged ? 'bg-violet-700/50' : 'bg-emerald-600'}`}
+          className={`relative mt-8 rounded-xl px-8 py-4 font-display text-[24px] text-white ${merged ? 'bg-blue-700/50' : 'bg-teal-600'}`}
           animate={merged ? { scale: [1, 0.92, 1.06, 1] } : {}}
           transition={{ duration: 0.5 }}
         >
           {merged ? '✓ Pull request merged' : 'Merge pull request'}
-          {!merged && <span className="pz-ping absolute inset-0 rounded-xl border-2 border-emerald-300" style={{ animationDelay: '700ms' }} aria-hidden="true" />}
+          {!merged && <span className="pz-ping absolute inset-0 rounded-xl border-2 border-teal-300" style={{ animationDelay: '700ms' }} aria-hidden="true" />}
         </motion.button>
-        {merged && <motion.div className="pointer-events-none absolute inset-0 rounded-2xl" initial={{ boxShadow: '0 0 0 0 rgba(139,92,246,0.7)', backgroundColor: 'rgba(196,181,253,0.16)' }} animate={{ boxShadow: '0 0 0 90px rgba(139,92,246,0)', backgroundColor: 'rgba(196,181,253,0)' }} transition={{ duration: 1.1 }} />}
+        {merged && <motion.div className="pointer-events-none absolute inset-0 rounded-2xl" initial={{ boxShadow: '0 0 0 0 rgba(32,149,211,0.7)', backgroundColor: 'rgba(147,197,253,0.16)' }} animate={{ boxShadow: '0 0 0 90px rgba(32,149,211,0)', backgroundColor: 'rgba(147,197,253,0)' }} transition={{ duration: 1.1 }} />}
       </Show>
 
     </>
@@ -325,490 +314,11 @@ const MERGE_BEATS = [
   },
 ];
 
-/* ------------------------------------------------------------------ *
- * Many at once.
- * ------------------------------------------------------------------ */
-
-const TICKETS = [64, 65, 66, 67, 68, 69, 70, 71, 72, 73];
-const STAGES = ['setup', 'spec', 'build', 'gate', 'audit', 'PR'];
-
-function ScaleScene({ step }) {
-  return (
-    <>
-      <Replay on={step === 0} style={at(80, 70, 1440, 540)} className={`${box} overflow-hidden`}>
-        <div className="grid grid-cols-[110px_250px_1fr_150px] border-b border-hairline bg-raised px-6 py-2.5 font-mono text-[13px] uppercase tracking-wider text-faint">
-          <span>ticket</span><span>worktree · lane</span><span>{STAGES.join(' → ')}</span><span className="text-right">result</span>
-        </div>
-        {TICKETS.map((n, i) => {
-          const human = n === 70;
-          const dur = 3.2 + ((i * 7) % 5) * 0.55;
-          return (
-            <div key={n} className="pz-appear grid grid-cols-[110px_250px_1fr_150px] items-center border-b border-hairline/50 px-6 py-[9px]" style={later(i * 90)}>
-              <span className="font-mono text-[17px] text-ink">#{n}</span>
-              <span className="font-mono text-[14px] text-muted">wt-{n} · :{4300 + 2 * (i + 1)}</span>
-              <div className="h-2.5 overflow-hidden rounded-full bg-overlay">
-                <motion.div
-                  className={`h-full rounded-full ${human ? 'bg-gradient-to-r from-violet-500 to-amber-400' : 'bg-gradient-to-r from-violet-500 to-cyan-300'}`}
-                  initial={{ width: '0%' }}
-                  animate={{ width: human ? '78%' : '100%' }}
-                  transition={{ duration: dur, delay: 0.4 + i * 0.12, ease: [0.4, 0, 0.2, 1] }}
-                />
-              </div>
-              <motion.span
-                className="text-right"
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 + i * 0.12 + dur, type: 'spring', stiffness: 300, damping: 15 }}
-              >
-                {human ? <Label name="needs-human" className="text-[12px]" /> : <span className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-emerald-300"><PrIcon /> PR</span>}
-              </motion.span>
-            </div>
-          );
-        })}
-        {/* the tally, once the last lane is home */}
-        <div className="pz-appear flex items-center gap-6 px-6 py-3 text-[16px] text-muted" style={later(7000)}>
-          <span className="flex items-center gap-2"><span className="inline-flex items-center gap-1.5 font-semibold text-emerald-300"><PrIcon /> 9</span> pull requests, ready for review</span>
-          <span className="flex items-center gap-2"><Label name="needs-human" className="text-[12px]" /> 1 question, back to you</span>
-          <span className="ml-auto font-mono text-[14px] text-faint">nobody watched any of them</span>
-        </div>
-      </Replay>
-
-    </>
-  );
-}
-
-const SCALE_BEATS = [
-  {
-    kicker: '7 · Don’t babysit one ticket — hand it ten',
-    title: '/ship 64 65 66 67 68 69 70 71 72 73',
-    body: 'Nothing about ship needs you watching, so start the next nine. Each ticket gets its own worktree and ports — or label ten issues and get ten runners. Most come back as pull requests, one as a question. The limit is not the worktrees — it is how many you can review well.',
-  },
-];
-
-/* ------------------------------------------------------------------ *
- * Your role — what the harness leaves to you, then the bookend.
- * ------------------------------------------------------------------ */
-
-/** Every ticket's AI spend — the dial you tune the harness by. */
-function CostPanel({ on }) {
-  return (
-    <Replay on={on} style={at(80, 80, 1440, 520)} className="grid grid-cols-[1fr_1fr_1fr] gap-6">
-      <div className={`${box} col-span-1 p-6`}>
-        <Kicker>On every issue</Kicker>
-        <div className="mt-2 font-display text-[28px] text-ink">🧾 AI spend</div>
-        <div className="mt-1 text-[16px] text-muted">one comment, updated after every run</div>
-        <div className="mt-5 space-y-3">
-          {[['ship', 0.82], ['code review', 0.36], ['QA', 0.58], ['respond', 0.18]].map(([run, w], i) => (
-            <div key={run}>
-              <div className="flex justify-between text-[15px] text-muted"><span>{run}</span></div>
-              <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-overlay">
-                <span className="pz-fill block h-full bg-violet-400" style={{ width: `${w * 60}%`, animationDuration: '0.9s', animationDelay: `${300 + i * 200}ms` }} />
-                <span className="pz-fill block h-full bg-sky-400" style={{ width: `${w * 30}%`, animationDuration: '0.9s', animationDelay: `${500 + i * 200}ms` }} />
-                <span className="pz-fill block h-full bg-emerald-400" style={{ width: `${w * 10}%`, animationDuration: '0.9s', animationDelay: `${700 + i * 200}ms` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-5 flex gap-2"><Model m="opus" /><Model m="sonnet" /><Model m="haiku" /></div>
-      </div>
-      {[
-        { tone: 'emerald', pr: 96, title: 'Name the search when nothing matches', size: '🟢 A small ticket', ship: '12 min · Sonnet · one audit round', qa: 'QA skipped in 16 s — covered by its own tests', cost: 0.91 },
-        { tone: 'sky', pr: 97, title: 'Fix Undo after removing an ended seat', size: '🔵 A bigger ticket', ship: '22 min · Opus · plan audit, three lenses', qa: 'QA high confidence — 3 browser probes', cost: 7.99 },
-      ].map((t, i) => (
-        <div key={t.pr} className={`pz-appear flex flex-col rounded-2xl border p-6 ${t.tone === 'emerald' ? 'border-emerald-400/40 bg-emerald-500/[0.05]' : 'border-sky-400/40 bg-sky-500/[0.05]'}`} style={later(400 + i * 400)}>
-          <Kicker>{t.size}</Kicker>
-          <div className="mt-2 font-display text-[24px] leading-tight text-ink">PR #{t.pr} — {t.title}</div>
-          <div className="mt-4 space-y-2 text-[16px] text-muted">
-            <div>🚢 {t.ship}</div>
-            <div>🔍 code review: high confidence, about a minute</div>
-            <div>🧪 {t.qa}</div>
-          </div>
-          <div className="mt-auto pt-4 font-display text-[64px] leading-none text-ink">
-            <Count to={t.cost} prefix="$" decimals={2} delay={700 + i * 400} />
-          </div>
-          <div className="text-[15px] text-faint">label to merged, nobody at a terminal</div>
-        </div>
-      ))}
-    </Replay>
-  );
-}
-
-function RoleScene({ step }) {
-  return (
-    <>
-      <CostPanel on={step === 0} />
-
-      <Show on={step === 1} style={at(80, 90, 1440, 500)} className="grid grid-cols-4 gap-6">
-        {[
-          ['✍️', 'You write the ticket', 'Its Done when is the contract every agent is judged against. The thinking moved up front — it did not go away.'],
-          ['🔧', 'You tune the harness', 'Which model, how many rounds, which checks. Shaping it to your codebase is engineering work, and it is yours.'],
-          ['🚦', 'You keep the gate', 'Nothing merges itself. The confidence tells you where your attention goes; the artifacts let you check in a minute.'],
-          ['🧠', 'You pace the work', 'You lead a team of agents now. Run as many as you can review well — that is the real limit.'],
-        ].map(([icon, t, d], i) => (
-          <motion.div
-            key={t}
-            className={`${box} flex flex-col p-7`}
-            initial={{ opacity: 0, y: 60, rotateX: -25 }}
-            animate={{ opacity: 1, y: 0, rotateX: 0 }}
-            transition={{ delay: 0.2 + i * 0.15, type: 'spring', stiffness: 120, damping: 16 }}
-          >
-            <span className="text-[52px]">{icon}</span>
-            <div className="mt-5 font-display text-[30px] leading-tight text-ink">{t}</div>
-            <div className="mt-3 text-[18px] text-muted">{d}</div>
-          </motion.div>
-        ))}
-      </Show>
-
-      {/* the bookend: the title's orbits, back behind the last words */}
-      <Show on={step === 2} from="none" delay={400} style={at(0, 0, 1600, 900)} className="pointer-events-none">
-        <Orbits style={at(380, 10, 840, 840)} className="opacity-30" />
-      </Show>
-      <Show on={step === 2} from="scale" style={at(80, 70, 1440, 760)} className="flex flex-col items-center justify-center text-center">
-        <div className="font-display text-[88px] leading-[0.98] text-ink">
-          Have the conversation.<br />
-          Review the pull request.<br />
-          <span className="pz-shine bg-clip-text text-transparent">The harness does the rest.</span>
-        </div>
-        <div className="mt-10 font-mono text-[20px] text-muted">github.com/EqualExperts/nam-2026-conference</div>
-        <div className="mt-3 text-[17px] text-faint">The ship loop is Andy Vays’s design · built by Jonas Claesson and Abraham Marín Pérez at Equal Experts</div>
-      </Show>
-    </>
-  );
-}
-
-const ROLE_BEATS = [
-  {
-    kicker: '8 · Tuning it is your job',
-    title: 'Every ticket says what it cost — so you can tune it',
-    body: 'One AI spend comment per issue, split by run and by model: under a dollar for a small fix, eight for a bigger one. When a small ticket costs like a big one, this is how you notice — and the sizing rules are yours to change.',
-  },
-  {
-    kicker: '8 · Your role',
-    title: 'You are the tech lead of a team of agents',
-    body: 'None of this replaces engineering judgement; it moves it to where it counts. And trust comes from what you can check — a spec, a failing test, every audit round, a confidence on every review — not from the model.',
-  },
-  null,
-];
-
-/* ------------------------------------------------------------------ *
- * Now you — the lab: ship a ticket of your own, in your fork. Drawn as
- * the room will see it: GitHub in a browser and the Code tab of Claude
- * Desktop — no terminal, which is not where most of the room works.
- * ------------------------------------------------------------------ */
-
-const LAB_STEPS = [
-  ['🎫', 'Pick a ticket', 'on GitHub, in your fork’s Issues'],
-  ['🚢', 'Ship it', 'ask Claude Desktop, in Code'],
-  ['👀', 'Review what comes back', 'the pull request — or the question'],
-];
-
-/*
- * GitHub, drawn light the way the room sees it: the repo header and its tabs,
- * then a page. Close enough to recognise, not a copy.
- */
-const GH = {
-  ink: 'text-[#1f2328]', muted: 'text-[#59636e]', line: 'border-[#d1d9e0]',
-  open: 'text-[#1a7f37]', green: 'bg-[#1f883d]', link: 'text-[#0969da]',
-};
-
-function GhOpenIcon({ className = 'size-4' }) {
-  return (
-    <svg viewBox="0 0 16 16" className={className} fill="currentColor" aria-hidden="true">
-      <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" /><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z" />
-    </svg>
-  );
-}
-
-const GH_TABS = [['‹›', 'Code'], ['◉', 'Issues', 2], ['⇅', 'Pull requests', 1], ['▷', 'Actions']];
-
-function GitHub({ tab, children, className = '' }) {
-  return (
-    <div className={`overflow-hidden rounded-2xl border border-black/10 bg-white ${GH.ink} shadow-2xl shadow-black/50 ${className}`}>
-      <div className={`border-b ${GH.line} bg-[#f6f8fa] px-5 pt-3`}>
-        <div className="flex items-center gap-3 text-[16px]">
-          <span className="size-7 rounded-full bg-[#1f2328]" aria-hidden="true" />
-          <span className={GH.muted}>you</span><span className={GH.muted}>/</span><span className="font-semibold">nam-2026-conference</span>
-          <span className={`ml-auto rounded-md border ${GH.line} bg-white px-3 py-1 text-[13px] ${GH.muted}`}>Type / to search</span>
-        </div>
-        <div className="mt-2 flex gap-6 text-[14px]">
-          {GH_TABS.map(([icon, name, n]) => (
-            <span key={name} className={`flex items-center gap-1.5 border-b-2 pb-2 ${name === tab ? 'border-[#fd8c73] font-semibold' : `border-transparent ${GH.muted}`}`}>
-              <span className="text-[12px] opacity-70">{icon}</span>{name}
-              {n && <span className="rounded-full bg-black/[0.07] px-1.5 text-[12px]">{n}</span>}
-            </span>
-          ))}
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-/**
- * The Code tab of Claude Desktop, as the room will see it: a light window, the
- * project in the sidebar, the session in the middle, its environment on the right.
- */
-const SIDEBAR = [['＋', 'New', '⌘N'], ['⌕', 'Search'], ['▢', 'Artifacts'], ['◫', 'Customize'], ['⋯', 'More']];
-
-function ClaudeDesktop() {
-  return (
-    <div className="flex h-[400px] overflow-hidden rounded-2xl border border-black/10 bg-white text-[#1f1e1d] shadow-2xl shadow-black/50">
-      <div className="w-[215px] shrink-0 border-r border-black/10 bg-[#f7f7f5] px-3 py-3 text-[14px]">
-        <div className="flex items-center gap-1.5">
-          <span className="size-3 rounded-full bg-[#ff5f57]" /><span className="size-3 rounded-full bg-[#febc2e]" /><span className="size-3 rounded-full bg-[#28c840]" />
-          {/* chat or code: two icons, code chosen */}
-          <span className="ml-auto flex gap-1">
-            <span className="grid size-7 place-items-center rounded-lg text-black/45" aria-hidden="true">
-              <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z" strokeLinejoin="round" /></svg>
-            </span>
-            <span className="grid size-7 place-items-center rounded-lg border border-black/10 bg-white text-black/80 shadow-sm" aria-hidden="true">
-              <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5M9 3 7 13" /></svg>
-            </span>
-          </span>
-        </div>
-        <div className="mt-3 space-y-0.5">
-          {SIDEBAR.map(([icon, label, key], i) => (
-            <div key={label} className={`flex items-center gap-2.5 rounded-lg px-2 py-1 ${i === 0 ? 'bg-black/5' : ''}`}>
-              <span className="w-4 text-center text-black/60">{icon}</span>{label}
-              {key && <span className="ml-auto text-[12px] text-black/40">{key}</span>}
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 px-2 text-[13px] text-black/50">nam-2026-conference ▾</div>
-        <div className="mt-1 rounded-lg bg-black/[0.07] px-2 py-1.5">Ship issue #42</div>
-      </div>
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="border-b border-black/10 px-5 py-2.5 text-[15px]">Ship issue #42 <span className="text-black/40">⌄</span></div>
-        <div className="flex-1 space-y-3 px-5 py-4 text-[15px] leading-relaxed">
-          <div className="pz-appear flex justify-end" style={later(300)}>
-            <div className="max-w-[300px] rounded-2xl bg-[#f0eee6] px-4 py-2.5">Hey, can you ship GitHub issue #42?</div>
-          </div>
-          <div className="pz-appear" style={later(1200)}>
-            On it. I’ll post every step on issue #42, so you can follow along there.
-            <ul className="mt-1.5 space-y-0.5">
-              {['Read the ticket — it can be built', 'A small one, so a light run', 'Writing the plan…'].map((l, i) => (
-                <li key={l} className="pz-appear flex gap-2" style={later(1700 + i * 450)}>
-                  <span className={i < 2 ? 'text-[#2f9e5b]' : 'text-[#d97757]'}>{i < 2 ? '✓' : '●'}</span>{l}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="mx-4 mb-4 rounded-2xl border border-black/10 px-4 py-3 text-[14px] text-black/40 shadow-sm">Reply to Claude…</div>
-      </div>
-
-      <div className="w-[215px] shrink-0 p-3">
-        <div className="rounded-xl border border-black/10 p-3 text-[13px]">
-          <div className="font-medium">Environment ▾</div>
-          <div className="mt-2 space-y-1.5 text-black/80">
-            <div>💻 This computer</div>
-            <div>📁 nam-2026-conference</div>
-            <div>⑂ main</div>
-          </div>
-        </div>
-        <div className="mt-2 flex justify-between rounded-xl border border-black/10 p-3 text-[13px]">
-          <span className="font-medium">Context ▸</span><span className="text-black/50">6%</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** The turn from talk to lab: the room's cue to open their laptops. */
-function YourTurn() {
-  return (
-    <div className="flex size-full flex-col items-center justify-center text-center">
-      <Kicker className="pz-appear">That was the theory</Kicker>
-      <div className="pz-appear mt-5 font-display text-[110px] leading-none text-ink" style={later(200)}>
-        Now it’s <span className="pz-shine bg-clip-text text-transparent">your turn</span>
-      </div>
-      <div className="pz-appear mt-6 max-w-[980px] text-[26px] leading-snug text-muted" style={later(600)}>
-        One ticket from your fork, all the way to a pull request — in GitHub and Claude Desktop. We are here to help.
-      </div>
-      <div className="mt-12 flex gap-5">
-        {LAB_STEPS.map(([icon, title, sub], i) => (
-          <div key={title} className="pz-appear w-[370px] rounded-2xl border border-hairline bg-surface px-6 py-5 text-left" style={later(1100 + i * 250)}>
-            <div className="font-mono text-[14px] text-emerald-300">step {i + 1}</div>
-            <div className="mt-1 text-[22px] font-semibold text-ink">{icon} {title}</div>
-            <div className="text-[16px] text-muted">{sub}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function LabScene({ step: beat }) {
-  // beat 0 is the turn to the room; the three steps follow it
-  const step = beat - 1;
-  return (
-    <>
-      <Show on={beat === 0} from="scale" style={at(80, 60, 1440, 780)}><YourTurn /></Show>
-
-      <Show on={beat > 0} from="left" style={at(80, 80, 440, 520)} className="flex flex-col gap-4">
-        {LAB_STEPS.map(([icon, title, sub], i) => (
-          <div key={title} className={`flex items-center gap-4 rounded-2xl border px-5 py-5 transition-all duration-500
-            ${i === step ? 'pz-glow border-emerald-400/60 bg-raised' : 'border-hairline bg-surface'} ${i > step ? 'opacity-45' : ''}`}>
-            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-overlay font-display text-[24px] text-ink">{i < step ? '✓' : i + 1}</span>
-            <div>
-              <div className="text-[22px] font-semibold text-ink">{icon} {title}</div>
-              <div className="text-[16px] text-muted">{sub}</div>
-            </div>
-          </div>
-        ))}
-      </Show>
-
-      {/* 1 · the fork's Issues list, then the issue itself opening over it */}
-      <Replay on={step === 0} from="right" style={at(570, 80, 950, 520)}>
-        <GitHub tab="Issues" className="relative h-full">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[22px] font-semibold">Issues</span>
-              <span className={`rounded-md ${GH.green} px-3 py-1 text-[14px] font-semibold text-white`}>New issue</span>
-            </div>
-            <div className={`mt-3 overflow-hidden rounded-md border ${GH.line}`}>
-              <div className={`flex gap-4 border-b ${GH.line} bg-[#f6f8fa] px-4 py-2 text-[14px]`}>
-                <span className="font-semibold">Open <span className="rounded-full bg-black/[0.07] px-1.5">2</span></span>
-                <span className={GH.muted}>Closed</span>
-              </div>
-              {[
-                ['Pick more than one track on the schedule', 42, 'just now', true],
-                ['Name the search when nothing matches', 43, '2 days ago', false],
-              ].map(([t, n, when, pick], i) => (
-                <div key={n} className={`pz-appear flex gap-3 border-b ${GH.line} px-4 py-2.5 last:border-b-0 ${pick ? 'bg-[#ddf4ff]/60' : ''}`} style={later(200 + i * 150)}>
-                  <GhOpenIcon className={`mt-1 size-4 shrink-0 ${GH.open}`} />
-                  <div>
-                    <div className="text-[16px] font-semibold">{t}</div>
-                    <div className={`text-[13px] ${GH.muted}`}>#{n} · opened {when}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* the click: the issue page slides up over the list */}
-          <div className="pz-appear absolute inset-x-0 bottom-0 top-[86px] bg-white px-6 py-4" style={later(1400)}>
-            <div className="text-[24px] leading-tight">Pick more than one track on the schedule <span className="text-[#59636e]">#42</span></div>
-            <span className={`mt-2 inline-flex items-center gap-1.5 rounded-full ${GH.green} px-3 py-1 text-[14px] font-semibold text-white`}><GhOpenIcon /> Open</span>
-            <div className="mt-3 grid grid-cols-[1fr_180px] gap-5">
-              <div className={`overflow-hidden rounded-md border border-[#54aeff]/60`}>
-                <div className="flex items-center gap-2 border-b border-[#54aeff]/40 bg-[#ddf4ff] px-4 py-2 text-[14px]">
-                  <span className="size-5 rounded-full bg-violet-300" aria-hidden="true" />
-                  <b>you</b><span className={GH.muted}>opened just now</span>
-                </div>
-                <div className="px-4 py-3">
-                  <div className={`border-b ${GH.line} pb-1 text-[18px] font-semibold`}>Acceptance criteria</div>
-                  <ul className="mt-2 space-y-1.5 text-[15px]">
-                    {['The schedule’s track filter takes more than one track', 'It shows sessions in any of the tracks picked'].map((d, i) => (
-                      <li key={d} className="pz-appear flex items-center gap-2" style={later(1900 + i * 200)}>
-                        <span className={`size-4 shrink-0 rounded border ${GH.line}`} />{d}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className={`pz-appear mt-3 text-[15px] ${GH.muted}`} style={later(2400)}><b className={GH.ink}>Out of scope:</b> the speakers page</div>
-                </div>
-              </div>
-              <div className="space-y-3 text-[14px]">
-                <div className={`border-b ${GH.line} pb-2`}><div className={`font-semibold ${GH.muted}`}>Assignees</div><div className={GH.muted}>No one</div></div>
-                <div className={`border-b ${GH.line} pb-2`}><div className={`font-semibold ${GH.muted}`}>Labels</div><span className="mt-1 inline-block rounded-full bg-[#a2eeef] px-2 text-[12px] font-semibold">enhancement</span></div>
-              </div>
-            </div>
-          </div>
-        </GitHub>
-      </Replay>
-
-      {/* 2 · Claude Desktop, Code tab, opened on the fork's folder — drawn light, as the app looks */}
-      <Replay on={step === 1} from="right" style={at(570, 80, 950, 520)} className="flex flex-col gap-4">
-        <ClaudeDesktop />
-        <div className="pz-appear grid grid-cols-2 gap-4" style={later(3200)}>
-          <div className={`${box} px-5 py-3`}>
-            <Kicker>While it runs</Kicker>
-            <div className="mt-1 text-[17px] text-muted">Watch the issue on GitHub. The plan lands first — read it.</div>
-          </div>
-          <div className={`${box} px-5 py-3`}>
-            <Kicker>Another ticket?</Kicker>
-            <div className="mt-1 text-[17px] text-muted">Ask in the same chat: “ship #43 too”.</div>
-          </div>
-        </div>
-      </Replay>
-
-      {/* 3 · the pull request on GitHub, or the question */}
-      <Replay on={step === 2} from="right" style={at(570, 80, 950, 520)} className="flex flex-col gap-4">
-        <GitHub tab="Pull requests">
-          <div className="px-6 py-4">
-            <div className="text-[22px] leading-tight">Pick more than one track on the schedule <span className="text-[#59636e]">#44</span></div>
-            <div className="mt-2 flex items-center gap-2 text-[14px]">
-              <span className={`inline-flex items-center gap-1.5 rounded-full ${GH.green} px-3 py-1 font-semibold text-white`}><PrIcon /> Open</span>
-              <span className={GH.muted}>wants to merge into <span className="rounded bg-[#ddf4ff] px-1 font-mono text-[13px] text-[#0969da]">main</span> · Closes #42</span>
-            </div>
-            <div className={`mt-2 flex gap-5 border-b ${GH.line} text-[14px]`}>
-              {['Conversation', 'Commits', 'Checks', 'Files changed'].map((t, i) => (
-                <span key={t} className={`border-b-2 pb-1.5 ${i === 0 ? 'border-[#fd8c73] font-semibold' : `border-transparent ${GH.muted}`} ${t === 'Files changed' ? 'font-semibold text-[#1f2328]' : ''}`}>
-                  {t}{t === 'Files changed' && <span className="ml-1 rounded-full bg-[#ffebe9] px-1.5 text-[12px] text-[#cf222e]">read me</span>}
-                </span>
-              ))}
-            </div>
-            {/* in a fork no runner reviews it: you ask, from the same Claude Desktop chat */}
-            <div className="pz-appear mt-2.5 flex items-center gap-3" style={later(200)}>
-              <span className="text-[13px] leading-tight text-[#59636e]">Normally GitHub Actions runs these.<br />Your fork has no API key, so ask:</span>
-              <span className="rounded-2xl bg-[#f0eee6] px-3 py-1.5 text-[14px]">Can you review and QA pull request #44?</span>
-            </div>
-            <div className="mt-2 space-y-2">
-              {[['🔍', 'Code review', 'Every criterion traced to the code.'], ['🧪', 'QA', 'Two tracks picked on desktop and phone — both show.']].map(([icon, who, what], i) => (
-                <div key={who} className={`pz-appear overflow-hidden rounded-md border ${GH.line}`} style={later(1100 + i * 400)}>
-                  <div className={`flex items-center gap-2 border-b ${GH.line} bg-[#f6f8fa] px-3 py-1 text-[13px]`}>
-                    <span>{icon}</span><b>{who}</b><span className={GH.muted}>commented</span>
-                    <span className="ml-auto rounded-full bg-[#dafbe1] px-2 font-semibold text-[#1a7f37]">high confidence ●●●</span>
-                  </div>
-                  <div className="px-3 py-1 text-[14px]">{what}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </GitHub>
-        <div className="pz-appear grid grid-cols-[1fr_1fr] gap-4" style={later(1200)}>
-          <div className="rounded-2xl border-2 border-dashed border-amber-400/60 bg-amber-500/10 px-5 py-3">
-            <Label name="needs-human" />
-            <div className="mt-1 text-[16px] text-muted">Read its question, answer it on the issue, then ask Claude to ship it again.</div>
-          </div>
-          <div className="flex items-center gap-4 rounded-2xl border border-violet-400/40 bg-raised px-5">
-            <span className="text-[34px]">🙋</span>
-            <span className="text-[18px] text-ink">Stuck? Put your hand up — we are walking the room.</span>
-          </div>
-        </div>
-      </Replay>
-    </>
-  );
-}
-
-const LAB_BEATS = [
-  null,
-  {
-    kicker: '9 · Now you · step 1',
-    title: 'Pick a ticket from your fork',
-    body: 'On GitHub, open your fork’s Issues tab. Use the one the product harness just raised, or any issue with a Done when list — and read it first: what it asks for, and what it leaves out.',
-  },
-  {
-    kicker: '9 · Now you · step 2',
-    title: 'Ask Claude to ship it — then let it run',
-    body: 'In Claude Desktop, switch to Code, open your nam-2026-conference folder and ask in plain words: “can you ship issue #42?” Then follow the issue on GitHub, not the chat.',
-  },
-  {
-    kicker: '9 · Now you · step 3',
-    title: 'Review what comes back — and read the code',
-    body: 'In a fork there is no Actions key, so ask Claude to review and QA the pull request — each posts a comment with a confidence. Then open Files changed, read the code and merge.',
-  },
-];
-
 export const NEEDS_HUMAN = [
   { id: 'needs-human', name: 'When it gets stuck', accent: 'text-amber-300', tone: 'amber', beats: NEEDS_HUMAN_BEATS, Scene: NeedsHumanScene },
 ];
 
 export const AFTER = [
   { id: 'review', name: 'Review and QA', accent: 'text-cyan-300', tone: 'cyan', beats: REVIEW_BEATS, Scene: ReviewScene },
-  { id: 'merge', name: 'Merge', accent: 'text-violet-300', tone: 'violet', beats: MERGE_BEATS, Scene: MergeScene },
-  { id: 'scale', name: 'Many at once', accent: 'text-sky-300', tone: 'sky', beats: SCALE_BEATS, Scene: ScaleScene },
-  { id: 'role', name: 'Your role', accent: 'text-violet-300', tone: 'violet', beats: ROLE_BEATS, Scene: RoleScene },
-  { id: 'lab', name: 'Now you', accent: 'text-emerald-300', tone: 'emerald', beats: LAB_BEATS, Scene: LabScene },
+  { id: 'merge', name: 'Merge', accent: 'text-blue-300', tone: 'violet', beats: MERGE_BEATS, Scene: MergeScene },
 ];

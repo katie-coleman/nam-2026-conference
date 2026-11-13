@@ -61,7 +61,7 @@ EXISTS` throughout); `migrate()` execs it, `dropAll()` drops every table child-f
 Tables: `users`, `venues`, `venue_travel`, `tracks`, `tags`, `rooms`, `speakers`,
 `sessions`, `session_tags`, `session_speakers`, `reservations`, `check_ins`,
 `speaker_follows`, `ratings`, `vendors`, `sponsors`, `announcements`. Column-level detail:
-`docs/DATA_MODEL.md`.
+`context/engineering-context/data-model.md`.
 
 **Mappers** (`server/lib/query.js`). `SESSION_SELECT` joins session → track → room → venue
 and computes `waitlist_count`; append `WHERE …` to it. `toSession(row, extra)` derives
@@ -85,7 +85,7 @@ batched `IN (…)` queries — use it for lists; bare `toSession` has no speaker
 
 **Client shell.** `src/main.jsx`: `StrictMode → BrowserRouter → Toaster → ConferenceProvider
 → App`. `src/App.jsx` shows `ErrorState` if bootstrap failed, `Spinner` until `ready`, then
-the routes. `/product-presentation` and `/engineering-presentation` sit outside it, full screen; the rest are inside `<Layout>`: `/` Home, `/schedule`, `/sessions/:id`, `/speakers`,
+the routes. `/opening-presentation`, `/product-presentation` and `/engineering-presentation` sit outside it, full screen; the rest are inside `<Layout>`: `/` Home, `/schedule`, `/sessions/:id`, `/speakers`,
 `/speakers/:id`, `/my-agenda`, `/my-plan` (→ `/my-agenda`), `/venues`, `/food`, `/expo`,
 `/code-of-conduct`, `/accessibility`, `*` NotFound.
 

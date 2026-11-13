@@ -164,7 +164,7 @@ await open(); await dialog.getByRole('button', { name: 'Close' }).click({ positi
 ```
 
 If the backdrop click times out with "element intercepts pointer events", the
-panel covers that corner: the sheet is too tall — cap it (`docs/context/ui.md`
+panel covers that corner: the sheet is too tall — cap it (`context/engineering-context/ui.md`
 § Dialogs), do not move the click. While iterating, run it on
 `--project=desktop --max-failures=1 --timeout=10000` (ship playbook §6), then
 once on mobile.
@@ -207,7 +207,7 @@ once on mobile.
   `scripts/gate.mjs`): it never ran, so it proves nothing. Make its precondition hold — a lane, a
   slot, a pinned clock — rather than letting `test.skip(!target, …)` fire.
 - **Never open `data/orbit.db` to learn the seed** — `node -e "require('better-sqlite3')…"` from an
-  agent's shell crashed on #78 and #70. Read `docs/context/seed.md`, or ask the API: `attendedSession()`
+  agent's shell crashed on #78 and #70. Read `context/engineering-context/seed.md`, or ask the API: `attendedSession()`
   in `tests/api/harness.js`, `bookableFor()` in `tests/helpers.js`, or `curl localhost:$PORT/api/…`.
 - `tests/unit/lanes.test.js` fails `npm test` when two panes share an attendee and day
   (unless one is `readOnly: true`, exactly one is `agenda: false`, or both pin distinct
@@ -241,7 +241,7 @@ once on mobile.
   entry for the *same* attendee and day, because `lanes.test.js` checks that pairing, not
   what the test writes (`attendance.checkin-toast`/`attendance.rating-toast` do this).
 - New route: add it to `ROUTES` in `tests/smoke.spec.js` with its heading regex — unless it renders
-  outside `<Layout>`, as the two presentations do: smoke expects a header and footer, so a
+  outside `<Layout>`, as the three presentations do: smoke expects a header and footer, so a
   full-screen route gets its own spec (`tests/presentation.spec.js`), which the
   ship gate skips unless the branch touches a deck.
 - New endpoint: `tests/api/endpoints.test.js` (see architecture).

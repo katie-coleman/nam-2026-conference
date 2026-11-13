@@ -3,24 +3,43 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, MotionConfig, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 import { Backdrop } from './Backdrop.jsx';
 import { useEntries } from './kit.jsx';
-import { beatAfter, clampBeat, keyAction, locateBeat, parseBeat } from '../../lib/presentation.js';
+import { beatAfter, clampBeat, keyAction, litAt, locateBeat, parseBeat } from '../../lib/presentation.js';
 import { useDocumentTitle } from '../../lib/useDocumentTitle.js';
 
 /**
  * A talk the presenter steps through: full screen, outside <Layout>, no header
  * or footer. Each chapter is a layer on a fixed 1600×900 stage; a beat is one
- * press. Both talks — /product-presentation, then /engineering-presentation —
- * are a Deck, so the second picks up exactly where the first leaves off.
+ * press. All three talks — /opening-presentation, /product-presentation, then
+ * /engineering-presentation — are a Deck, so each picks up exactly where the
+ * one before leaves off.
  *
  * `next` is the talk that follows: from the last beat, one more press goes there.
  * With `next.delay` (ms) the current scene is told it is `leaving` first and the
  * stars warp, so a hand-off can play out before the route changes; under
  * reduced motion it navigates at once. A scene also gets `advance`, so a button
  * on the stage can be the clicker.
+ *
+ * `captions="top"` puts each beat's caption at the top of the stage instead of
+ * the bottom; that deck's scenes leave the top for it (see `opening/opening.jsx`).
  */
 
 const STAGE_W = 1600;
 const STAGE_H = 900;
+const RAILED_SCALE = 0.84;
+
+/**
+ * The NAM 2026 tab: a small blue tab at top right holding the Equal Experts
+ * mark. No slide number: the chapter bar already counts the beats.
+ */
+function Frame() {
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div data-testid="deck-tab" className="absolute right-[56px] top-0 flex h-[64px] w-[104px] items-center justify-center rounded-b-xl bg-tab">
+        <img src="/brand/Equal_Experts_Logo_Monochrome_White.svg" alt="" className="w-[76px]" />
+      </div>
+    </div>
+  );
+}
 
 function useStageScale() {
   const fit = () => Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H);
@@ -62,6 +81,7 @@ function Layer({ chapter, state, step, cut, leaving, advance }) {
         ? { duration: 0.5, opacity: { duration: 0.5 } }
         : { type: 'spring', stiffness: 70, damping: 18, mass: 1, opacity: { duration: 0.7 }, filter: { duration: 0.7 } }}
       aria-hidden={state === 'current' ? undefined : true}
+      data-state={state}
       className="absolute inset-0"
     >
       <div key={entries} className="absolute inset-0">
@@ -79,25 +99,34 @@ const WORD = {
 // No exit animation: with AnimatePresence a fast clicker could press on before
 // the old caption finished leaving, and it stayed on screen under the new beat.
 // The old caption goes at once; the new one's words still rise in.
-function Caption({ beat, accent, index }) {
+function Caption({ beat, index, top }) {
   if (!beat) return null;
+  // a hero beat is a title slide: the caption is the slide, set large mid-stage
+  const hero = beat.hero;
   return (
     <motion.div
       key={index}
       data-testid="presentation-caption"
       className="absolute"
-      style={{ left: 80, top: 650, width: 1440 }}
+      style={hero ? { left: 80, top: 230, width: 980 } : { left: 80, top: top ? 66 : 650, width: 1440 }}
       initial="hidden"
       animate="shown"
       transition={{ staggerChildren: 0.035 }}
     >
-      <motion.div variants={WORD} className={`font-mono text-[15px] uppercase tracking-[0.2em] ${accent}`}>{beat.kicker}</motion.div>
-      <h2 className="mt-2 font-display text-[46px] leading-tight text-ink">
+      {/* a beat can belong to a named section (`lesson: { label, n }`): a badge, and its number large behind the headline */}
+      {beat.lesson && (
+        <motion.div variants={WORD} aria-hidden="true" className={`pointer-events-none absolute right-0 top-[-34px] font-display text-[200px] font-bold leading-none text-edge`}><span className="opacity-40">{beat.lesson.n}</span></motion.div>
+      )}
+      <motion.div variants={WORD} data-eyebrow className={`flex items-center gap-4 font-semibold uppercase tracking-[0.2em] text-edge ${hero ? 'text-[24px]' : 'text-[15px]'}`}>
+        {beat.lesson && <span className="rounded-full border-2 border-current bg-white/5 px-4 py-0.5 font-display text-[20px] font-semibold tracking-[0.14em] [word-spacing:0.35em]">{beat.lesson.label}</span>}
+        {beat.kicker}
+      </motion.div>
+      <h2 className={`font-display font-bold text-ink ${hero ? 'mt-5 text-[108px] leading-[0.95]' : 'mt-2 text-[46px] leading-tight'}`}>
         {beat.title.split(' ').map((w, i) => (
           <motion.span key={i} variants={WORD} transition={{ type: 'spring', stiffness: 220, damping: 22 }} className="mr-[0.25em] inline-block">{w}</motion.span>
         ))}
       </h2>
-      <motion.p variants={WORD} transition={{ duration: 0.6, delay: 0.25 }} className="mt-3 max-w-[1180px] text-[22px] leading-relaxed text-muted">
+      <motion.p variants={WORD} transition={{ duration: 0.6, delay: 0.25 }} className={`max-w-[1180px] leading-relaxed text-muted ${hero ? 'mt-8 text-[28px]' : 'mt-3 text-[22px]'}`}>
         {beat.body}
       </motion.p>
     </motion.div>
@@ -117,7 +146,7 @@ function useParallax() {
   return { rotateX, rotateY, onPointerMove };
 }
 
-export function Deck({ chapters: CHAPTERS, title, next }) {
+export function Deck({ chapters: CHAPTERS, title, next, captions = 'bottom', Rail }) {
   useDocumentTitle(title);
   const COUNTS = useMemo(() => CHAPTERS.map((c) => c.beats.length), [CHAPTERS]);
   const TOTAL = COUNTS.reduce((a, b) => a + b, 0);
@@ -177,11 +206,14 @@ export function Deck({ chapters: CHAPTERS, title, next }) {
 
   const chapterStarts = useMemo(() => COUNTS.map((_, i) => COUNTS.slice(0, i).reduce((a, b) => a + b, 0)), [COUNTS]);
   const current = CHAPTERS[chapter];
+  // a chapter's `rail` says which nodes to light; with none lit there is no rail and the stage keeps its size
+  const lit = Rail ? litAt(current.rail, step) : [];
+  const railed = lit.length > 0;
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="fixed inset-0 select-none overflow-hidden bg-ground text-ink" data-testid="presentation" onPointerMove={parallax.onPointerMove}>
-      <Backdrop tone={current.tone} warpKey={leaving ? 'leaving' : chapter} />
+    <div className="deck fixed inset-0 select-none overflow-hidden bg-ground text-ink" data-testid="presentation" onPointerMove={parallax.onPointerMove}>
+      <Backdrop />
 
       {/* The stage. Clicking anywhere on it moves on, as a clicker would. */}
       <div
@@ -189,7 +221,9 @@ export function Deck({ chapters: CHAPTERS, title, next }) {
         style={{ width: STAGE_W, height: STAGE_H, transform: `translate(-50%, -50%) scale(${scale})`, perspective: 1800 }}
         onClick={advance}
       >
-        <motion.div className="absolute inset-0" style={{ rotateX: parallax.rotateX, rotateY: parallax.rotateY, transformStyle: 'preserve-3d' }}>
+        <Frame />
+        {/* with a rail up the scenes shrink, anchored to the bottom, so none that starts at the top sits under it */}
+        <motion.div className="absolute inset-0" initial={false} animate={{ scale: railed ? RAILED_SCALE : 1 }} transition={{ duration: 0.5 }} style={{ rotateX: parallax.rotateX, rotateY: parallax.rotateY, transformStyle: 'preserve-3d', transformOrigin: '50% 100%' }}>
           {CHAPTERS.map((c, i) => {
             if (Math.abs(i - chapter) > 1) return null;
             const state = i < chapter ? 'past' : i > chapter ? 'future' : 'current';
@@ -198,8 +232,9 @@ export function Deck({ chapters: CHAPTERS, title, next }) {
             const cut = CHAPTERS[Math.max(i, chapter)].enter === 'cut';
             return <Layer key={c.id} chapter={c} state={state} step={s} cut={cut} leaving={leaving} advance={advance} />;
           })}
-          <Caption beat={current.beats[step]} accent={current.accent} index={beat} />
+          <Caption beat={current.beats[step]} index={beat} top={captions === 'top'} />
         </motion.div>
+        {Rail && <Rail lit={lit} commands={Boolean(current.rail?.commands)} />}
       </div>
 
       {/* Chrome — outside the stage so it stays crisp at any scale. */}
@@ -208,7 +243,7 @@ export function Deck({ chapters: CHAPTERS, title, next }) {
         <span className="text-faint">/</span>
         <span className="text-muted" data-testid="presentation-chapter">{current.name}</span>
         <span className="ml-auto font-mono text-faint" data-testid="presentation-counter">{beat + 1} / {TOTAL}</span>
-        <button type="button" onClick={toggleFullscreen} className="rounded-md border border-hairline px-2 py-1 text-muted hover:bg-overlay hover:text-ink" aria-label="Toggle full screen (F)">
+        <button type="button" onClick={toggleFullscreen} className="rounded-md border border-edge/60 px-2 py-1 text-muted hover:bg-overlay hover:text-ink" aria-label="Toggle full screen (F)">
           ⛶
         </button>
       </div>
@@ -228,16 +263,16 @@ export function Deck({ chapters: CHAPTERS, title, next }) {
                 aria-current={i === chapter ? 'step' : undefined}
               >
                 <span className="absolute inset-x-0 bottom-1.5 h-1 overflow-hidden rounded-full bg-overlay group-hover:h-1.5">
-                  <span className="block h-full rounded-full bg-gradient-to-r from-violet-400 to-cyan-300 transition-[width] duration-500" style={{ width: `${done * 100}%` }} />
+                  <span className="block h-full rounded-full bg-gradient-to-r from-blue-400 to-cyan-300 transition-[width] duration-500" style={{ width: `${done * 100}%` }} />
                 </span>
               </button>
             );
           })}
         </nav>
         <button type="button" data-testid="presentation-prev" onClick={() => go(beat - 1)} disabled={beat === 0}
-          className="rounded-lg border border-hairline bg-surface/80 px-3 py-1.5 text-[13px] text-muted hover:text-ink disabled:opacity-30" aria-label="Previous">←</button>
+          className="rounded-lg border border-edge/60 bg-surface px-3 py-1.5 text-[13px] text-muted hover:text-ink disabled:opacity-30" aria-label="Previous">←</button>
         <button type="button" data-testid="presentation-next" onClick={() => go(beat + 1)} disabled={!next && beat === TOTAL - 1}
-          className="rounded-lg border border-hairline bg-surface/80 px-3 py-1.5 text-[13px] text-muted hover:text-ink disabled:opacity-30"
+          className="rounded-lg border border-edge/60 bg-surface px-3 py-1.5 text-[13px] text-muted hover:text-ink disabled:opacity-30"
           aria-label={next && beat === TOTAL - 1 ? `Next: ${next.label}` : 'Next'}>→</button>
       </div>
       <span className="sr-only" aria-live="polite">{`Beat ${beat + 1} of ${TOTAL}: ${current.beats[step]?.title ?? current.name}`}</span>

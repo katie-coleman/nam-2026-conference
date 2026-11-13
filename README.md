@@ -4,6 +4,8 @@
 
 **A workshop on AI across the software delivery lifecycle**
 
+[▶️ Try the app](https://orbit26.up.railway.app/)
+
 </div>
 
 A conference app wired to two AI harnesses: one turns a conversation into a
@@ -12,8 +14,12 @@ blank — building it is the workshop.
 
 ## 📺 Watch
 
-1. [🎙️ The product harness](https://orbit26.up.railway.app/product-presentation) — a conversation → a ticket
-2. [🚢 The engineering harness](https://orbit26.up.railway.app/engineering-presentation) — a ticket → a pull request
+The three talks, in the order they're given — the opening sets out why the day is
+built around shared context and parallel work, then each harness gets its own.
+
+1. [🛰️ Welcome to NAM 2026](https://orbit26.up.railway.app/opening-presentation) — the opening: shared context and parallel work
+2. [🎙️ The product harness](https://orbit26.up.railway.app/product-presentation) — a conversation → a ticket
+3. [🚢 The engineering harness](https://orbit26.up.railway.app/engineering-presentation) — a ticket → a pull request
 
 ## 🚀 Set up
 
@@ -46,10 +52,12 @@ to turn on Actions. A checklist shows how far along you are.
    gh repo clone <you>/nam-2026-conference && cd nam-2026-conference
    gh repo set-default "$(git remote get-url origin)"
    npm install && npx playwright install chromium
-   claude    # then /setup-winnow, and say no to audio
+   claude
    ```
 
 </details>
 
 Then `/winnow` turns a conversation into tickets and `/ship 42` builds one —
-the [workshop quickstart](docs/harness/quickstart.md) walks through both.
+the [workshop quickstart](context/engineering-context/harness/quickstart.md) walks through both.
+Both read and write [`context/`](context/index.md): the product and engineering
+knowledge they share, and the conversations Winnow works from.

@@ -35,7 +35,7 @@ function Rail({ active }) {
   return (
     <>
       <div style={at(80, RAIL_Y, 1440, 2)} className="rounded-full bg-hairline" />
-      <div style={{ ...at(80, RAIL_Y, Math.max(0, x - 80), 2) }} className="rounded-full bg-gradient-to-r from-violet-500 to-cyan-300 transition-[width] duration-1000 ease-out" />
+      <div style={{ ...at(80, RAIL_Y, Math.max(0, x - 80), 2) }} className="rounded-full bg-gradient-to-r from-blue-500 to-cyan-300 transition-[width] duration-1000 ease-out" />
       <Token
         className="absolute"
         initial={{ left: TOKEN_PARK.left, top: TOKEN_PARK.top, scale: 0.9 }}
@@ -51,7 +51,7 @@ export function Station({ s, state = 'idle' }) {
   return (
     <div
       className={`flex size-full flex-col items-center justify-center rounded-xl border text-center transition-all duration-500
-        ${state === 'active' ? 'pz-glow -translate-y-1 border-violet-400/70 bg-raised' : 'border-hairline bg-surface'}
+        ${state === 'active' ? 'pz-glow -translate-y-1 border-blue-400/70 bg-raised' : 'border-edge bg-surface'}
         ${state === 'next' ? 'opacity-45' : ''}`}
     >
       <span className="text-[24px] leading-none">{s.icon}</span>
@@ -68,13 +68,13 @@ function Stations({ active }) {
       <div key={s.id} style={at(SX(i), STATION_Y, STATION_W, 84)} className="relative">
         <Station s={s} state={state} />
         {/* the stamp: a ring leaves the station the moment the ticket arrives */}
-        {state === 'active' && <span key={active} className="pz-ping pointer-events-none absolute inset-0 rounded-xl border-2 border-violet-300" aria-hidden="true" />}
+        {state === 'active' && <span key={active} className="pz-ping pointer-events-none absolute inset-0 rounded-xl border-2 border-blue-300" aria-hidden="true" />}
       </div>
     );
   });
 }
 
-const box = 'rounded-2xl border border-hairline bg-surface';
+const box = 'rounded-2xl border border-edge bg-surface';
 
 function Row({ icon, title, sub, delay }) {
   return (
@@ -95,8 +95,8 @@ function SetupDetail() {
         <Kicker>The ticket</Kicker>
         <div className="mt-3 font-display text-[24px] leading-tight text-ink">#140 Keep sessions in view on mobile</div>
         <div className="mt-4 space-y-2 text-[15px] text-muted">
-          {['first card visible on a phone', 'every filter reachable', 'mobile specs still pass'].map((d, i) => (
-            <div key={d} className="pz-appear flex gap-2" style={later(200 + i * 150)}><span className="text-violet-300">☐</span>{d}</div>
+          {['first session in view on a phone', 'every filter still there', 'laptop unchanged'].map((d, i) => (
+            <div key={d} className="pz-appear flex gap-2" style={later(200 + i * 150)}><span className="text-blue-300">☐</span>{d}</div>
           ))}
         </div>
       </div>
@@ -117,22 +117,22 @@ function SetupDetail() {
 
 const SPEC_LINES = [
   { t: '# Keep sessions in view on mobile', c: 'text-ink font-semibold' },
-  { t: '## What this changes', c: 'text-violet-300' },
+  { t: '## What this changes', c: 'text-blue-300' },
   { t: 'Below lg the opened filter rail is compact: days in one row, selects in two columns.', c: 'text-muted' },
-  { t: '## Where', c: 'text-violet-300' },
+  { t: '## Where', c: 'text-blue-300' },
   { t: 'src/pages/SchedulePage.jsx — the rail · tests/schedule.spec.js', c: 'text-muted' },
-  { t: '## How it will be proved', c: 'text-violet-300' },
-  { t: '| first card in view | phone, Filters open | spec |', c: 'text-emerald-300' },
-  { t: '## Decisions', c: 'text-violet-300' },
+  { t: '## How it will be proved', c: 'text-blue-300' },
+  { t: '| first card in view | phone, Filters open | spec |', c: 'text-teal-300' },
+  { t: '## Decisions', c: 'text-blue-300' },
   { t: 'Hide the My agenda card below lg — OK?', c: 'text-amber-300' },
 ];
 
 function SpecDetail() {
   return (
     <div className="grid h-full grid-cols-[1.6fr_1fr] gap-6">
-      <div className="overflow-hidden rounded-2xl border border-hairline bg-[#0d0f15]">
-        <div className="flex border-b border-hairline bg-surface font-mono text-[13px]">
-          <span className="border-r border-hairline bg-[#0d0f15] px-4 py-2 text-ink">specs/140-compact-mobile-filters.md</span>
+      <div className="overflow-hidden rounded-2xl border border-hairline bg-[#071322]">
+        <div className="flex border-b border-edge bg-surface font-mono text-[13px]">
+          <span className="border-r border-hairline bg-[#071322] px-4 py-2 text-ink">specs/140-compact-mobile-filters.md</span>
         </div>
         <div className="space-y-1.5 px-6 py-4 font-mono text-[16px]">
           {SPEC_LINES.map((l, i) => <div key={i} className={`pz-appear ${l.c}`} style={later(150 + i * 220)}>{l.t}</div>)}
@@ -157,32 +157,64 @@ function ImplementDetail() {
     <div className="grid h-full grid-cols-[1fr_auto_1fr] items-stretch gap-5">
       <div className={`${box} flex flex-col p-5`}>
         <Kicker>1 · the check first</Kicker>
-        <div className="mt-3 rounded-xl bg-[#0d0f15] p-4 font-mono text-[15px] leading-relaxed">
-          <div className="text-violet-300">test(<span className="text-emerald-300">'on a phone the open filter</span></div>
-          <div className="text-emerald-300 pl-4">rail leaves the first session in view'</div>
+        <div className="mt-3 rounded-xl bg-[#071322] p-4 font-mono text-[15px] leading-relaxed">
+          <div className="text-blue-300">test(<span className="text-teal-300">'on a phone the open filter</span></div>
+          <div className="text-teal-300 pl-4">rail leaves the first session in view'</div>
           <div className="text-muted pl-4">await page.getByRole('button', {'{'} name: 'Filters' {'}'}).click()</div>
           <div className="text-muted pl-4">await expect(firstCard).toBeInViewport()</div>
         </div>
         <div className="pz-appear mt-4 flex items-center gap-3 text-[18px] text-rose-300" style={later(600)}><Tick ok={false} /> fails — the filters fill the screen</div>
         <div className="pz-appear mt-2 font-mono text-[14px] text-amber-300" style={later(900)}>● test(schedule): first session stays in view</div>
       </div>
-      <div className="flex items-center text-[34px] text-violet-300">→</div>
+      <div className="flex items-center text-[34px] text-blue-300">→</div>
       <div className={`${box} flex flex-col p-5`}>
         <Kicker>2 · then the change</Kicker>
-        <div className="pz-appear mt-3 rounded-xl bg-[#0d0f15] p-4 font-mono text-[15px] leading-relaxed" style={later(1300)}>
+        <div className="pz-appear mt-3 rounded-xl bg-[#071322] p-4 font-mono text-[15px] leading-relaxed" style={later(1300)}>
           <div className="text-faint">src/pages/SchedulePage.jsx</div>
           <div className="bg-rose-500/10 text-rose-300">- &lt;div className="space-y-6"&gt;</div>
-          <div className="bg-emerald-500/10 text-emerald-300">+ &lt;div className="grid grid-cols-2 gap-2</div>
-          <div className="bg-emerald-500/10 pl-4 text-emerald-300">+   lg:block lg:space-y-6"&gt;</div>
+          <div className="bg-teal-500/10 text-teal-300">+ &lt;div className="grid grid-cols-2 gap-2</div>
+          <div className="bg-teal-500/10 pl-4 text-teal-300">+   lg:block lg:space-y-6"&gt;</div>
         </div>
-        <div className="pz-appear mt-4 flex items-center gap-3 text-[18px] text-emerald-300" style={later(2100)}><Tick /> passes</div>
+        <div className="pz-appear mt-4 flex items-center gap-3 text-[18px] text-teal-300" style={later(2100)}><Tick /> passes</div>
         <div className="pz-appear mt-2 text-[16px] text-muted" style={later(2400)}>The docs that describe what changed are updated in the same push.</div>
       </div>
     </div>
   );
 }
 
-/* The gate, then the same test run twice: with the change, then with the old
+/* The gate: everything runs, and one exit code decides. */
+const GATE = [
+  ['Unit and API tests', 'every one, in about a second'],
+  ['Browser tests, desktop and mobile', 'all of them — or, on a fast run, the ones the change reaches'],
+  ['Tests it deleted or skipped', 'listed for the auditor — a test cannot quietly go missing'],
+];
+
+function GateDetail() {
+  return (
+    <div className="grid h-full grid-cols-[1fr_420px] gap-6">
+      <div className={`${box} flex flex-col gap-3 p-6`}>
+        <Kicker>scripts/gate.mjs</Kicker>
+        {GATE.map(([what, how], i) => (
+          <div key={what} className="pz-appear flex items-center gap-4 rounded-xl bg-raised px-5 py-3" style={later(300 + i * 350)}>
+            <Tick />
+            <div>
+              <div className="text-[21px] text-ink">{what}</div>
+              <div className="text-[16px] text-muted">{how}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className={`${box} pz-appear flex flex-col justify-center p-6`} style={later(1500)}>
+        <div className="font-mono text-[26px] text-teal-300">{'{"ok":true}'}</div>
+        <div className="mt-3 text-[20px] text-muted">
+          The script reads the exit code, not the agent’s word. <b className="text-ink">Red goes back to the implementer</b>, however sure it sounds.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* The same test run twice: with the change, then with the old
  * code put back. The code card turns over to origin/main and the green result
  * flips red. */
 function Run({ file, tone, children }) {
@@ -197,7 +229,7 @@ function Run({ file, tone, children }) {
 
 function Result({ ok, label }) {
   return (
-    <div className={`flex h-full items-center gap-3 rounded-xl px-5 text-[22px] ${ok ? 'bg-emerald-500/10 text-emerald-300' : 'bg-rose-500/10 text-rose-300'}`}>
+    <div className={`flex h-full items-center gap-3 rounded-xl px-5 text-[22px] ${ok ? 'bg-teal-500/10 text-teal-300' : 'bg-rose-500/10 text-rose-300'}`}>
       <Tick ok={ok} /> {label}
     </div>
   );
@@ -209,7 +241,7 @@ function RedCheckDetail() {
     <div className="grid h-full grid-cols-[1fr_1fr] gap-6">
       <div className={`${box} flex flex-col p-6`}>
         <Kicker>1 · With the change</Kicker>
-        <div className="mt-3 h-[96px]"><Run file="SchedulePage.jsx" tone="border-emerald-400/40 bg-emerald-500/[0.06]"><span className="text-emerald-300">+ grid grid-cols-2 gap-2 lg:block</span></Run></div>
+        <div className="mt-3 h-[96px]"><Run file="SchedulePage.jsx" tone="border-teal-400/40 bg-teal-500/[0.06]"><span className="text-teal-300">+ grid grid-cols-2 gap-2 lg:block</span></Run></div>
         <div className="pz-appear mt-4 h-[64px]" style={later(300)}><Result ok label="first session stays in view — passes" /></div>
         <div className="pz-appear mt-3 text-[18px] text-muted" style={later(700)}>Green, across the whole gate. Green alone proves little.</div>
       </div>
@@ -218,7 +250,7 @@ function RedCheckDetail() {
         <Flip
           className="mt-3 h-[96px]"
           delay={FLIP}
-          front={<Run file="SchedulePage.jsx" tone="border-emerald-400/40 bg-emerald-500/[0.06]"><span className="text-emerald-300">+ grid grid-cols-2 gap-2 lg:block</span></Run>}
+          front={<Run file="SchedulePage.jsx" tone="border-teal-400/40 bg-teal-500/[0.06]"><span className="text-teal-300">+ grid grid-cols-2 gap-2 lg:block</span></Run>}
           back={<Run file="SchedulePage.jsx" tone="border-amber-400/50 bg-amber-500/[0.08]"><span className="text-amber-300">origin/main — the fix reverted, the test kept</span></Run>}
         />
         <Flip
@@ -227,10 +259,10 @@ function RedCheckDetail() {
           front={<Result ok label="first session stays in view — passes" />}
           back={<Result ok={false} label="first session stays in view — fails" />}
         />
-        <div className="pz-appear mt-3 text-[18px] text-emerald-300" style={later(FLIP + 1200)}>… which is the point: the test can tell the two apart.</div>
+        <div className="pz-appear mt-3 text-[18px] text-teal-300" style={later(FLIP + 1200)}>… which is the point: the test can tell the two apart.</div>
       </div>
       <div className="pz-appear col-span-2 rounded-xl border border-hairline bg-raised px-6 py-4 text-[19px] text-muted" style={later(FLIP + 1700)}>
-        <Code>scripts/gate.mjs</Code> runs every unit, API and browser test, desktop and mobile — an exit code no agent can argue with. Then <Code>scripts/red-check.mjs</Code>: <b className="text-ink">a test that still passes without the fix proves nothing</b>.
+        <Code>scripts/red-check.mjs</Code> puts the old code back and runs the new tests: <b className="text-ink">a test that still passes without the fix proves nothing</b>.
       </div>
     </div>
   );
@@ -285,7 +317,7 @@ function AuditDetail() {
       <div className="pz-appear mt-auto flex items-center gap-3 rounded-xl border border-hairline bg-raised px-5 py-3" style={later(3400)}>
         <span className="text-[26px]">🧀</span>
         {SLICES.map(([name, ai, holes]) => (
-          <span key={name} className={`relative flex h-11 flex-1 items-center justify-center overflow-hidden rounded-lg text-[14px] font-semibold ${ai ? 'bg-amber-400/20 text-amber-100' : 'bg-emerald-400/20 text-emerald-100'}`}>
+          <span key={name} className={`relative flex h-11 flex-1 items-center justify-center overflow-hidden rounded-lg text-[14px] font-semibold ${ai ? 'bg-amber-400/20 text-amber-100' : 'bg-teal-400/20 text-teal-100'}`}>
             {holes.map(([x, y]) => <span key={`${x}-${y}`} className="absolute size-3 rounded-full bg-ground/70" style={{ left: `${x}%`, top: `${y}%` }} />)}
             <span className="relative">{name}</span>
           </span>
@@ -316,7 +348,7 @@ function LoopDetail() {
     <div className="grid h-full grid-cols-[520px_1fr] gap-8">
       <div className="relative">
         <svg viewBox="0 0 520 400" className="absolute inset-0 size-full" aria-hidden="true">
-          <circle cx="260" cy="200" r="150" fill="none" stroke="#333950" strokeWidth="3" />
+          <circle cx="260" cy="200" r="150" fill="none" stroke="#1f5c80" strokeWidth="3" />
           <circle cx="260" cy="200" r="150" pathLength="1" className="pz-flow" fill="none" stroke="#fbbf24" strokeWidth="3" />
         </svg>
         {nodes.map((n, i) => (
@@ -330,7 +362,7 @@ function LoopDetail() {
         <div className="pz-appear flex items-center gap-4 rounded-xl border border-rose-400/40 bg-rose-500/10 px-5 py-3 text-[19px] text-rose-200" style={later(400)}>
           <span className="font-mono text-[15px] text-faint">Round 1</span> 1 blocker — the search field at 360 px
         </div>
-        <div className="pz-appear flex items-center gap-4 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-5 py-3 text-[19px] text-emerald-200" style={later(1500)}>
+        <div className="pz-appear flex items-center gap-4 rounded-xl border border-teal-400/40 bg-teal-500/10 px-5 py-3 text-[19px] text-teal-200" style={later(1500)}>
           <span className="font-mono text-[15px] text-faint">Round 2</span> clean <Tick className="ml-auto" />
         </div>
         <div className="pz-appear mt-2 space-y-2 text-[18px] text-muted" style={later(2100)}>
@@ -360,7 +392,7 @@ function PrDetail() {
         <div className="border-b border-hairline px-6 py-4">
           <div className="font-display text-[24px] leading-tight text-ink">Keep sessions in view on mobile <span className="font-sans font-normal text-faint">#142</span></div>
           <div className="mt-2 flex items-center gap-2 text-[14px]">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 font-semibold text-white"><PrIcon /> Open</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-3 py-1 font-semibold text-white"><PrIcon /> Open</span>
             <span className="text-muted">ready for review · Closes #140 · 📄 Spec</span>
           </div>
         </div>
@@ -387,7 +419,7 @@ function PrDetail() {
 }
 
 // One entry per beat: the station the ticket stops at, and what it shows there.
-// Setup takes two beats — the claim, then the sizing. Spec audit, Gate and Learn
+// Setup takes two beats — the claim, then the sizing. Spec audit and Learn
 // have no stop of their own: the ticket ticks them off on its way past, and
 // their story rides in the neighbouring captions.
 const STOPS = [
@@ -396,13 +428,14 @@ const STOPS = [
   { at: 0, Detail: SizeDetail },
   { at: 1, Detail: SpecDetail },
   { at: 3, Detail: ImplementDetail },
+  { at: 4, Detail: GateDetail },
   { at: 5, Detail: RedCheckDetail },
   { at: 6, Detail: AuditDetail },
   { at: 7, Detail: LoopDetail },
   { at: 9, Detail: PrDetail },
 ];
 /** Where the needs-human chapter breaks in: after the loop, before the pull request. */
-const PR_BEAT = 8;
+const PR_BEAT = 9;
 
 const LOOP_BACK = `M${center(7)} 160 C ${center(7)} 204, ${center(3)} 204, ${center(3)} 160`;
 
@@ -454,7 +487,7 @@ const SHIP_BEATS = [
   {
     kicker: '4.2 · Size it',
     title: 'Spend the frontier model where the decision is',
-    body: 'Setup runs on Opus because every later step is sized by its call: Sonnet and Haiku for mechanical work, Opus for the hard tickets. A diff that grows risky escalates itself — or force it with /ship 42 --full.',
+    body: 'On GitHub, setup picks Small or Full. From a chat, Claude asks you, and today you pick Fast.',
   },
   {
     kicker: '4.3 · Spec, then a spec audit',
@@ -467,22 +500,27 @@ const SHIP_BEATS = [
     body: 'The check is committed while it still fails, so the history proves it failed. Every state the change adds gets its own assertion, including the moment just before a time-dependent rule applies.',
   },
   {
-    kicker: '4.5 · The gate and the red-check',
-    title: 'A gate agents cannot argue with — and proof the test can fail',
-    body: 'Every unit, API and browser test, on desktop and on mobile: a script with an exit code. Then the old code goes back and the new tests run again — if they still pass, they never tested the change.',
+    kicker: '4.5 · The gate',
+    title: 'A gate agents cannot argue with',
+    body: 'Not AI at all: a script runs the tests and reads the exit code. An agent saying it is done counts for nothing until the gate is green.',
   },
   {
-    kicker: '4.6 · Code audit',
+    kicker: '4.6 · The red-check',
+    title: 'Proof the test can fail',
+    body: 'Green alone proves little. The old code goes back and the new tests run again: if they still pass, they never tested the change.',
+  },
+  {
+    kicker: '4.7 · Code audit',
     title: 'Independent auditors, and a skeptic for every blocker',
     body: 'One lens each: the ticket’s criteria, the repo’s rules, a real browser. No layer is trusted alone — like slices of Swiss cheese, each has holes, but not in the same places, and the gate and red-check are not AI at all.',
   },
   {
-    kicker: '4.7 · Fix and loop',
+    kicker: '4.8 · Fix and loop',
     title: 'Fix, gate, audit — until a round comes back clean',
     body: 'Round limits are code, not a prompt’s good intentions: two rounds for a small ticket, four for a full one. Nothing spins all night on your token bill.',
   },
   {
-    kicker: '4.9 · Learn, then the pull request',
+    kicker: '4.10 · Learn, then the pull request',
     title: 'A pull request you can actually review',
     body: 'What the audits caught becomes context the next agent reads. Then the pull request opens — spec, proof, every audit round, the decisions for you to confirm, and the cost. Never before the gate is green.',
   },
@@ -493,27 +531,16 @@ const SHIP_BEATS = [
 
  * ------------------------------------------------------------------ */
 
-const FACTS = [
-  ['areas', 'ui · tests'],
-  ['app files', '1'],
-  ['business rule', 'no'],
-  ['stored data', 'no'],
-  ['API', 'no'],
-  ['harness', 'no'],
-  ['open design questions', '1'],
-  ['new interaction', 'no'],
-];
-
-function Lane({ title, tone, steps, foot, glow }) {
+function Lane({ title, tone, steps, foot, at }) {
   return (
-    <div className={`rounded-2xl border p-5 transition-all duration-700 ${glow ? 'pz-glow border-emerald-400/50 bg-raised' : 'border-hairline bg-surface'}`}>
+    <div className="pz-appear rounded-2xl border border-edge bg-surface px-5 py-4" style={later(at)}>
       <div className="flex items-baseline justify-between">
-        <div className={`font-display text-[26px] ${tone}`}>{title}</div>
+        <div className={`font-display text-[24px] ${tone}`}>{title}</div>
         <div className="font-mono text-[15px] text-muted">{foot}</div>
       </div>
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        {steps.map(([label, m, n], i) => (
-          <span key={label} className="pz-appear flex items-center gap-2 rounded-xl border border-hairline bg-overlay/60 px-3 py-2 text-[15px] text-ink" style={later(300 + i * 120)}>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {steps.map(([label, m, n]) => (
+          <span key={label} className="flex items-center gap-2 rounded-xl border border-hairline bg-overlay/60 px-3 py-1.5 text-[15px] text-ink">
             {label}<Model m={m}>{n ? `${MODEL_NAME[m]} ×${n}` : undefined}</Model>
           </span>
         ))}
@@ -526,36 +553,13 @@ const MODEL_NAME = { opus: 'Opus', sonnet: 'Sonnet', haiku: 'Haiku' };
 
 function SizeDetail() {
   return (
-    <div className="grid h-full grid-cols-[400px_1fr] gap-6">
-      <div className={`${box} p-5`}>
-        <Model m="opus" className="text-[15px]">Setup · Opus</Model>
-        <div className="mt-2 font-display text-[22px] leading-tight text-ink">Reports facts, not a verdict</div>
-        <div className="mt-3 space-y-1">
-          {FACTS.slice(0, 6).map(([k, v], i) => (
-            <div key={k} className="pz-appear flex justify-between border-b border-hairline/60 pb-1 text-[15px]" style={later(200 + i * 90)}>
-              <span className="text-muted">{k}</span><span className="font-mono text-ink">{v}</span>
-            </div>
-          ))}
-        </div>
-        <div className="pz-appear mt-3 text-[15px] text-faint" style={later(900)}>
-          The <b className="text-ink">script</b> composes the run from these — an agent never picks its own budget.
-        </div>
-      </div>
-      <div className="flex flex-col gap-4">
-        <Lane
-          glow
-          title="🟢 Small — most tickets"
-          tone="text-emerald-300"
-          foot="2 rounds · ~$0.70–1.50"
-          steps={[['setup + plan', 'opus'], ['implement', 'sonnet'], ['gate', 'haiku'], ['one auditor', 'sonnet'], ['fix', 'sonnet'], ['PR', 'haiku']]}
-        />
-        <Lane
-          title="🔵 Full — rules, APIs, bigger changes"
-          tone="text-fuchsia-300"
-          foot="4 rounds · ~$6.50"
-          steps={[['setup', 'opus'], ['plan writer', 'opus'], ['plan audit', 'opus', 2], ['implement', 'opus'], ['gate', 'haiku'], ['auditors', 'opus', 3], ['fix', 'opus'], ['PR', 'haiku']]}
-        />
-      </div>
+    <div className="flex flex-col gap-3">
+      <Lane at={200} title="⚡ Fast — the workshop" tone="text-teal-300" foot="2 rounds"
+        steps={[['setup', 'sonnet'], ['plan', 'sonnet'], ['implement', 'sonnet'], ['gate, tests it reaches', 'haiku'], ['one auditor', 'sonnet'], ['fix', 'sonnet'], ['PR', 'haiku']]} />
+      <Lane at={450} title="🟢 Small — most tickets" tone="text-sky-300" foot="2 rounds"
+        steps={[['setup', 'opus'], ['plan', 'sonnet'], ['implement', 'sonnet'], ['gate', 'haiku'], ['auditors', 'sonnet', 2], ['fix', 'sonnet'], ['PR', 'haiku']]} />
+      <Lane at={700} title="🔵 Full — rules, APIs, bigger changes" tone="text-cyan-300" foot="4 rounds"
+        steps={[['setup', 'opus'], ['plan', 'opus'], ['plan audit', 'opus', 2], ['implement', 'opus'], ['gate', 'haiku'], ['auditors', 'opus', 3], ['fix', 'opus'], ['PR', 'haiku']]} />
     </div>
   );
 }
@@ -567,9 +571,9 @@ function PrScene({ step }) {
 
 export const SHIP = [
   // `enter: 'cut'` — the map chapter has already unpacked the stations into place, so this one lands on them
-  { id: 'ship', name: 'Inside ship', accent: 'text-violet-300', tone: 'violet', enter: 'cut', beats: SHIP_BEATS.slice(0, PR_BEAT), Scene: ShipScene },
+  { id: 'ship', name: 'Inside ship', accent: 'text-blue-300', tone: 'violet', enter: 'cut', beats: SHIP_BEATS.slice(0, PR_BEAT), Scene: ShipScene },
 ];
 
 export const SHIP_PR = [
-  { id: 'pr', name: 'The pull request', accent: 'text-violet-300', tone: 'violet', beats: SHIP_BEATS.slice(PR_BEAT), Scene: PrScene },
+  { id: 'pr', name: 'The pull request', accent: 'text-blue-300', tone: 'violet', beats: SHIP_BEATS.slice(PR_BEAT), Scene: PrScene },
 ];

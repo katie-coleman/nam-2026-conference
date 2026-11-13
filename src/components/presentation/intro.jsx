@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
-import { at, Show, Replay, Code, Label, Terminal, IssueCard, IssueIcon, PrIcon, MergeIcon, Kicker, Token, later } from './kit.jsx';
+import { at, Show, Replay, Code, Label, IssueCard, IssueIcon, PrIcon, MergeIcon, Kicker, Token, later } from './kit.jsx';
 import { STATIONS, Station, SX, STATION_W, STATION_Y, RAIL_Y, TOKEN_PARK } from './ship.jsx';
+import { GH, GhOpenIcon, GitHub, ClaudeDesktop } from './apps.jsx';
 import { ISSUE_140 } from './issue.js';
 
 /* ------------------------------------------------------------------ *
@@ -17,16 +18,16 @@ export function Orbits({ style = at(940, 20, 640, 640), className = '' }) {
     <svg viewBox="0 0 640 640" style={style} className={className} aria-hidden="true">
       <defs>
         <radialGradient id="pz-core" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#c4b5fd" stopOpacity="0.9" />
-          <stop offset="60%" stopColor="#8b5cf6" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+          <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.9" />
+          <stop offset="60%" stopColor="#2095d3" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="#2095d3" stopOpacity="0" />
         </radialGradient>
       </defs>
       <circle cx="320" cy="320" r="70" fill="url(#pz-core)" />
       <text x="320" y="331" textAnchor="middle" fontSize="34">🚢</text>
       {rings.map((ring, i) => (
         <g key={ring.r}>
-          <circle cx="320" cy="320" r={ring.r} fill="none" stroke="#333950" strokeDasharray={i === 1 ? '4 8' : undefined} />
+          <circle cx="320" cy="320" r={ring.r} fill="none" stroke="#1f5c80" strokeDasharray={i === 1 ? '4 8' : undefined} />
           <g className="pz-spin" style={{ transformOrigin: '320px 320px', animationDuration: ring.dur, animationDirection: i % 2 ? 'reverse' : 'normal' }}>
             {ring.words.map((w, j) => {
               const a = (j / ring.words.length) * Math.PI * 2 + i;
@@ -34,8 +35,8 @@ export function Orbits({ style = at(940, 20, 640, 640), className = '' }) {
               const y = 320 + Math.sin(a) * ring.r;
               return (
                 <g key={w}>
-                  <circle cx={x} cy={y} r="6" fill={['#a78bfa', '#67e8f9', '#6ee7b7'][i]} />
-                  <text x={x + 12} y={y + 5} fill="#9aa2b8" fontSize="15" fontFamily="JetBrains Mono, monospace">{w}</text>
+                  <circle cx={x} cy={y} r="6" fill={['#60a5fa', '#67e8f9', '#6ee7b7'][i]} />
+                  <text x={x + 12} y={y + 5} fill="#94a3b8" fontSize="15" fontFamily="Lexend, sans-serif">{w}</text>
                 </g>
               );
             })}
@@ -63,8 +64,8 @@ function TitleScene() {
           This one is a reference. Like Agile, what lasts is the way of working, not the tool.
         </p>
         <div className="pz-appear mt-9 space-y-1.5 whitespace-nowrap text-[19px] text-faint" style={later(900)}>
-          <div>🎙️ Product harness: a conversation → a ticket <span className="ml-2 text-emerald-300">✓</span></div>
-          <div className="text-muted"><span className="mr-3 text-violet-300">↳</span>🚢 <b className="text-ink">Engineering harness</b>: the ticket → a reviewed pull request</div>
+          <div>🎙️ Product harness: a conversation → a ticket <span className="ml-2 text-teal-300">✓</span></div>
+          <div className="text-muted"><span className="mr-3 text-blue-300">↳</span>🚢 <b className="text-ink">Engineering harness</b>: the ticket → a reviewed pull request</div>
         </div>
         <div className="pz-appear mt-6 flex items-center gap-3 text-[16px] text-faint" style={later(1200)}>
           <img src="/avatars/attendee-001.jpg" alt="Jonas" width={30} height={30} className="size-[30px] shrink-0 rounded-full object-cover ring-2 ring-hairline" />
@@ -81,9 +82,9 @@ function TitleScene() {
 
 const CONTEXT = [
   { name: 'CLAUDE.md', what: 'decisions and why', x: 70, y: 110, side: 'left' },
-  { name: 'docs/context/schedule.md', what: 'where it lives', x: 70, y: 260, side: 'left' },
+  { name: 'context/engineering-context/schedule.md', what: 'where it lives', x: 70, y: 260, side: 'left' },
   { name: '.claude/rules/ui.md', what: 'UI conventions', x: 70, y: 410, side: 'left' },
-  { name: 'docs/context/testing.md', what: 'how to prove it', x: 1240, y: 150, side: 'right' },
+  { name: 'context/engineering-context/testing.md', what: 'how to prove it', x: 1240, y: 150, side: 'right' },
   { name: 'specs/', what: 'every past plan', x: 1240, y: 330, side: 'right' },
 ];
 
@@ -98,12 +99,12 @@ function IssueScene() {
         {CONTEXT.map((c, i) => {
           const fromX = c.side === 'left' ? c.x + 290 : c.x;
           const toX = c.side === 'left' ? 390 : 1210;
-          const d = `M${fromX} ${c.y + 34} C ${(fromX + toX) / 2} ${c.y + 34}, ${(fromX + toX) / 2} 330, ${toX} 330`;
+          const d = `M${fromX} ${c.y + 42} C ${(fromX + toX) / 2} ${c.y + 42}, ${(fromX + toX) / 2} 330, ${toX} 330`;
           return (
             <g key={c.name}>
-              <path d={d} pathLength="1" className="pz-draw-in" fill="none" stroke="#4c3d7a" strokeWidth="2" style={later(DOCS_AT + 300 + i * 120)} />
+              <path d={d} pathLength="1" className="pz-draw-in" fill="none" stroke="#1f5c80" strokeWidth="2" style={later(DOCS_AT + 300 + i * 120)} />
               <g className="pz-appear" style={later(DOCS_AT + 1200 + i * 120)}>
-                <path d={d} pathLength="1" className="pz-flow" fill="none" stroke="#a78bfa" strokeWidth="2" opacity="0.8" />
+                <path d={d} pathLength="1" className="pz-flow" fill="none" stroke="#60a5fa" strokeWidth="2" opacity="0.8" />
               </g>
             </g>
           );
@@ -118,7 +119,7 @@ function IssueScene() {
             <ul className="mt-2 space-y-2.5">
               {ISSUE_140.doneWhen.map((d, i) => (
                 <Show key={d} as="li" from="left" delay={900 + i * 300} className="flex gap-3">
-                  <span className="mt-1 size-[18px] shrink-0 rounded border-2 border-violet-400/70" />
+                  <span className="mt-1 size-[18px] shrink-0 rounded border-2 border-blue-400/70" />
                   <span className="text-ink/90">{d}</span>
                 </Show>
               ))}
@@ -129,9 +130,14 @@ function IssueScene() {
       </div>
 
       {CONTEXT.map((c, i) => (
-        <Show key={c.name} from={c.side} delay={DOCS_AT + i * 120} style={at(c.x, c.y, 290, 68)}
-          className="rounded-xl border border-hairline bg-raised px-4 py-2.5">
-          <div className="font-mono text-[15px] text-ink">{c.name}</div>
+        <Show key={c.name} from={c.side} delay={DOCS_AT + i * 120} style={at(c.x, c.y, 290, 84)}
+          className="flex flex-col justify-center rounded-xl border border-hairline bg-raised px-4 py-2.5">
+          {c.name.includes('/') && !c.name.endsWith('/') && (
+            <div className="font-mono text-[12px] text-faint">{c.name.slice(0, c.name.lastIndexOf('/') + 1)}</div>
+          )}
+          <div className="font-mono text-[15px] text-ink">
+            {c.name.endsWith('/') ? c.name : c.name.slice(c.name.lastIndexOf('/') + 1)}
+          </div>
           <div className="text-[14px] text-faint">{c.what}</div>
         </Show>
       ))}
@@ -145,8 +151,9 @@ function IssueScene() {
 
 const DOORS = ['M800 58 C 800 96, 420 72, 420 112', 'M800 58 C 800 96, 1180 72, 1180 112'];
 
-/* One beat, both doors at once: the label lands on the left and the Actions
- * runner picks it up; /ship types on the right; both roads join at ship.js. */
+/* One beat, both doors at once: on GitHub the label lands and ship answers on
+ * the issue; in Claude Desktop you ask, pick the run, and it starts; both
+ * roads join at ship.js. The same two apps the lab shows at the end. */
 const JOIN_AT = 3200;
 
 function TwoWaysScene() {
@@ -157,68 +164,86 @@ function TwoWaysScene() {
       <svg viewBox="0 0 1600 900" className="pointer-events-none absolute inset-0" aria-hidden="true">
         {DOORS.map((d, i) => (
           <g key={d}>
-            <path d={d} pathLength="1" className="pz-draw-in" fill="none" stroke="#6d28d9" strokeWidth="2.5" style={later(500 + i * 150)} />
+            <path d={d} pathLength="1" className="pz-draw-in" fill="none" stroke="#1d6fa5" strokeWidth="2.5" style={later(500 + i * 150)} />
             <g className="pz-appear" style={later(1300)}>
-              <path d={d} pathLength="1" className="pz-flow" fill="none" stroke="#c4b5fd" strokeWidth="2.5" />
+              <path d={d} pathLength="1" className="pz-flow" fill="none" stroke="#93c5fd" strokeWidth="2.5" />
             </g>
           </g>
         ))}
       </svg>
 
-      <div style={at(80, 112, 680, 408)} className="card relative p-7">
-        <Kicker>🌐 In GitHub — no terminal</Kicker>
-        <div className="mt-2 font-display text-[34px] text-ink">Label it</div>
-        <div className="mt-5 flex items-center gap-3 rounded-xl border border-hairline bg-raised px-4 py-3">
-          <IssueIcon className="size-5 text-emerald-400" />
-          <span className="text-[18px] text-ink">#140 Keep sessions in view on mobile</span>
-          <span className="ml-auto flex gap-2">
-            <span className="pz-pop" style={later(700)}><Label name="ready-for-ai" /></span>
-          </span>
+      {/* the left door: the issue on GitHub, labelled, and ship answering on it */}
+      <div style={at(80, 112, 680, 408)} className="flex flex-col">
+        <div className="flex items-baseline gap-3">
+          <span className="font-display text-[30px] text-ink">Label it</span>
+          <Kicker>On GitHub</Kicker>
         </div>
-        <Replay delay={1100} className="mt-5 overflow-hidden rounded-xl border border-hairline bg-[#0d0f15]">
-          <div className="flex items-center gap-2 border-b border-hairline px-4 py-2 font-mono text-[13px] text-faint">
-            <span className="size-2 rounded-full bg-amber-400 animate-pulse-dot" /> Actions · agent-ship.yml
+        <GitHub tab="Issues" className="mt-3 min-h-0 flex-1">
+          <div className="px-5 py-3">
+            <div className="text-[20px] leading-tight">Keep sessions in view on mobile <span className={GH.muted}>#140</span></div>
+            <span className={`mt-1.5 inline-flex items-center gap-1.5 rounded-full ${GH.green} px-2.5 py-0.5 text-[13px] font-semibold text-white`}><GhOpenIcon className="size-3.5" /> Open</span>
+            <div className="mt-3 grid grid-cols-[1fr_150px] gap-4 text-[14px]">
+              <div className="space-y-2.5">
+                <div className={`pz-appear flex items-center gap-2 ${GH.muted}`} style={later(600)}>
+                  <span className="size-5 shrink-0 rounded-full bg-blue-300" aria-hidden="true" />
+                  <span><b className={GH.ink}>you</b> added the <span className="rounded-full bg-[#7dd3fc] px-2 text-[12px] font-semibold text-[#0c2a44]">ready-for-ai</span> label</span>
+                </div>
+                <div className={`pz-appear overflow-hidden rounded-md border ${GH.line}`} style={later(1500)}>
+                  <div className={`flex items-center gap-2 border-b ${GH.line} bg-[#f6f8fa] px-3 py-1.5`}>
+                    <span className="grid size-5 place-items-center rounded-full bg-[#1f2328] text-[11px] text-white" aria-hidden="true">▷</span>
+                    <b>github-actions</b><span className={GH.muted}>bot · just now</span>
+                  </div>
+                  <div className="space-y-1 px-3 py-2">
+                    <div className="font-semibold">🚢 Ship · fast · 1m elapsed</div>
+                    {[['Setup', 'done'], ['Spec', 'done'], ['Implement', 'running…']].map(([p, st], i) => (
+                      <div key={p} className="pz-appear flex justify-between" style={later(1900 + i * 300)}>
+                        <span>{p}</span><span className={st === 'done' ? GH.open : GH.muted}>{st}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className={`border-l ${GH.line} pl-3`}>
+                <div className={`font-semibold ${GH.muted}`}>Labels</div>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  <span className="pz-pop rounded-full bg-[#7dd3fc] px-2 text-[12px] font-semibold text-[#0c2a44]" style={later(600)}>ready-for-ai</span>
+                </div>
+                <div className={`pz-appear mt-2 text-[12px] ${GH.muted}`} style={later(1500)}>A fresh GitHub runner picked it up.</div>
+              </div>
+            </div>
           </div>
-          <div className="space-y-1 px-4 py-3 font-mono text-[15px] text-muted">
-            <div className="pz-appear" style={later(500)}>on: issues · labeled <span className="text-violet-300">ready-for-ai</span></div>
-            <div className="pz-appear" style={later(800)}>runs-on: ubuntu-latest · a fresh machine</div>
-            <div className="pz-appear text-ink" style={later(1100)}>claude › /ship 140</div>
-            <div className="pz-appear text-sky-300" style={later(1500)}>#140 → ai-working · progress posted on the issue</div>
-          </div>
-          <div className="relative h-1 overflow-hidden bg-overlay"><div className="pz-scan absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-violet-400 to-transparent" /></div>
-        </Replay>
+        </GitHub>
       </div>
 
-      <div style={at(840, 112, 680, 408)} className="card p-7">
-        <Kicker>💻 In Claude Code — your terminal</Kicker>
-        <div className="mt-2 font-display text-[34px] text-ink">Ship it</div>
-        <Terminal
-          className="mt-5"
-          title="~/nam-2026-conference — claude"
-          bodyClass="min-h-[228px] text-[16px]"
-          lines={[
-            { t: 'Ready. What should we build?', tone: 'dim' },
-            { t: '/ship 140', tone: 'cmd', delay: 700 },
-            { t: 'setup · reading #140 and the code it touches', delay: 1600 },
-            { t: 'worktree  .claude/worktrees/wt-140', delay: 2000 },
-            { t: 'lane 3 → api :4306 · web :4307', delay: 2400 },
-            { t: '#140 → ai-working', tone: 'ok', delay: 2800 },
-          ]}
+      {/* the right door: asking Claude, in Claude Desktop — the way the room will */}
+      <div style={at(840, 112, 680, 408)} className="flex flex-col">
+        <div className="flex items-baseline gap-3">
+          <span className="font-display text-[30px] text-ink">Ask Claude</span>
+          <Kicker>In Claude Desktop</Kicker>
+        </div>
+        <ClaudeDesktop
+          compact
+          className="mt-3 min-h-0 flex-1"
+          session="Ship issue #140"
+          ask="Can you ship issue #140?"
+          question={{ ask: 'How thorough should ship be?', options: ['Fast — for the workshop', 'Sized', 'Small', 'Full'] }}
+          reply="On it — a fast run, on your laptop in its own workspace."
+          steps={['Read the ticket — it can be built', 'Writing the plan…']}
         />
       </div>
 
       <svg viewBox="0 0 1600 900" className="pointer-events-none absolute inset-0" aria-hidden="true">
         {['M420 520 C 420 560, 560 576, 640 576', 'M1180 520 C 1180 560, 1040 576, 960 576'].map((d) => (
           <g key={d}>
-            <path d={d} pathLength="1" className="pz-draw-in" fill="none" stroke="#6d28d9" strokeWidth="3" style={later(JOIN_AT)} />
+            <path d={d} pathLength="1" className="pz-draw-in" fill="none" stroke="#1d6fa5" strokeWidth="3" style={later(JOIN_AT)} />
             <g className="pz-appear" style={later(JOIN_AT + 1000)}>
-              <path d={d} pathLength="1" className="pz-flow" fill="none" stroke="#c4b5fd" strokeWidth="3" />
+              <path d={d} pathLength="1" className="pz-flow" fill="none" stroke="#93c5fd" strokeWidth="3" />
             </g>
           </g>
         ))}
       </svg>
       <Show from="pop" delay={JOIN_AT + 600} style={at(640, 548, 320, 58)}
-        className="pz-glow grid place-items-center rounded-full border border-violet-400/60 bg-raised font-display text-[22px] text-ink">
+        className="pz-glow grid place-items-center rounded-full border border-blue-400/60 bg-raised font-display text-[22px] text-ink">
         <span>🚢 ship.js <span className="text-muted">— one script</span></span>
       </Show>
     </>
@@ -230,12 +255,12 @@ function TwoWaysScene() {
  * ------------------------------------------------------------------ */
 
 const NODES = [
-  { id: 'issue',  x: 70,   y: 250, w: 200, h: 120, icon: <IssueIcon className="size-7 text-emerald-400" />, label: 'Issue', sub: 'Done when…' },
+  { id: 'issue',  x: 70,   y: 250, w: 200, h: 120, icon: <IssueIcon className="size-7 text-teal-400" />, label: 'Issue', sub: 'Done when…' },
   { id: 'ship',   x: 360,  y: 210, w: 300, h: 200, icon: <span className="text-[34px]">🚢</span>, label: 'Ship', sub: 'spec · build · gate · audit · loop' },
-  { id: 'pr',     x: 760,  y: 250, w: 200, h: 120, icon: <PrIcon className="size-7 text-emerald-400" />, label: 'Pull request', sub: 'ready for review' },
+  { id: 'pr',     x: 760,  y: 250, w: 200, h: 120, icon: <PrIcon className="size-7 text-teal-400" />, label: 'Pull request', sub: 'ready for review' },
   { id: 'review', x: 1060, y: 140, w: 220, h: 110, icon: <span className="text-[26px]">🔍</span>, label: 'Code review', sub: 'a runner' },
   { id: 'qa',     x: 1060, y: 370, w: 220, h: 110, icon: <span className="text-[26px]">🧪</span>, label: 'QA', sub: 'a runner, a browser' },
-  { id: 'merge',  x: 1360, y: 250, w: 190, h: 120, icon: <MergeIcon className="size-7 text-violet-300" />, label: 'A person merges', sub: 'always' },
+  { id: 'merge',  x: 1360, y: 250, w: 190, h: 120, icon: <MergeIcon className="size-7 text-blue-300" />, label: 'A person merges', sub: 'always' },
 ];
 
 const EDGES = [
@@ -291,9 +316,9 @@ function MapScene({ step }) {
       <svg viewBox="0 0 1600 900" className="absolute inset-0" aria-hidden="true">
         {EDGES.map((d, i) => (
           <g key={d} className={`transition-opacity duration-700 ${zoom ? 'opacity-10' : ''}`}>
-            <path d={d} pathLength="1" className="pz-draw-in" fill="none" stroke="#4c3d7a" strokeWidth="3" style={later(200 + i * 160)} />
+            <path d={d} pathLength="1" className="pz-draw-in" fill="none" stroke="#1f5c80" strokeWidth="3" style={later(200 + i * 160)} />
             <g className="pz-appear" style={later(1200 + i * 160)}>
-              <path d={d} pathLength="1" className="pz-flow" fill="none" stroke="#a78bfa" strokeWidth="3" />
+              <path d={d} pathLength="1" className="pz-flow" fill="none" stroke="#60a5fa" strokeWidth="3" />
             </g>
           </g>
         ))}
@@ -308,7 +333,7 @@ function MapScene({ step }) {
           key={n.id}
           style={{ ...at(n.x, n.y, n.w, n.h), animationDelay: `${i * 140}ms` }}
           className={`pz-appear flex flex-col items-center justify-center rounded-2xl border text-center transition-opacity duration-700
-            ${n.id === 'ship' ? 'pz-glow border-violet-400/60 bg-raised' : 'border-hairline bg-surface'}
+            ${n.id === 'ship' ? 'pz-glow border-blue-400/60 bg-raised' : 'border-edge bg-surface'}
             ${zoom && n.id !== 'ship' ? 'opacity-10' : ''}`}
         >
           {n.icon}
@@ -334,7 +359,7 @@ function MapScene({ step }) {
         <div className="mt-1 text-[14px] text-amber-200/80">draft PR · back to you</div>
       </Show>
 
-      <Show on={!zoom} delay={AGENTS_AT + 1500} style={at(720, 520, 820, 80)} className="flex items-center gap-4 rounded-2xl border border-hairline bg-surface/80 px-6">
+      <Show on={!zoom} delay={AGENTS_AT + 1500} style={at(720, 520, 820, 80)} className="flex items-center gap-4 rounded-2xl border border-edge bg-surface/80 px-6">
         <span className="text-[30px]">📜</span>
         <span className="text-[20px] text-muted"><b className="text-ink">Scripts, not prompts.</b> The loops, round limits and who judges what are code in <Code>.claude/workflows/</Code></span>
       </Show>
@@ -346,12 +371,12 @@ function MapScene({ step }) {
 
 export const INTRO = [
   {
-    id: 'title', name: 'The engineering harness', accent: 'text-violet-300', tone: 'violet',
+    id: 'title', name: 'The engineering harness', accent: 'text-blue-300', tone: 'violet',
     beats: [null],
     Scene: TitleScene,
   },
   {
-    id: 'issue', name: 'The ticket', accent: 'text-emerald-300', tone: 'emerald',
+    id: 'issue', name: 'The ticket', accent: 'text-teal-300', tone: 'emerald',
     beats: [
       {
         kicker: '1 · The ticket',
@@ -366,14 +391,14 @@ export const INTRO = [
     beats: [
       {
         kicker: '2 · Starting it',
-        title: 'Label it on GitHub, or /ship it in Claude Code — same script',
-        body: 'ready-for-ai starts a fresh Actions runner that claims the issue and posts progress there; /ship 140 gives it its own worktree and ports locally. Either way it is ship.js — where it runs only changes who pays.',
+        title: 'Label it on GitHub, or ask Claude — same script',
+        body: 'The label starts a fresh GitHub runner that claims the issue and posts progress there. Asking Claude runs it on your laptop, in its own workspace. Either way it is ship.js — where it runs only changes who pays.',
       },
     ],
     Scene: TwoWaysScene,
   },
   {
-    id: 'map', name: 'The whole flow', accent: 'text-violet-300', tone: 'violet',
+    id: 'map', name: 'The whole flow', accent: 'text-blue-300', tone: 'violet',
     beats: [
       {
         kicker: '3 · The whole flow',

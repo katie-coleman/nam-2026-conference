@@ -6,10 +6,10 @@ files:
   - .claude/workflows/ship.js
   - .claude/workflows/code-review.js
   - .claude/workflows/qa.js
-  - docs/harness/ship-playbook.md
-  - docs/harness/github.md
-  - docs/harness/code-review-playbook.md
-  - docs/harness/qa-playbook.md
+  - context/engineering-context/harness/ship-playbook.md
+  - context/engineering-context/harness/github.md
+  - context/engineering-context/harness/code-review-playbook.md
+  - context/engineering-context/harness/qa-playbook.md
   - .github/workflows/agent-ship.yml
   - .github/workflows/agent-code-review.yml
   - .github/workflows/agent-qa.yml
@@ -31,7 +31,7 @@ files:
   - .claude/settings.json
   - scripts/depends.mjs
   - ONBOARD_CLAUDE.md
-  - docs/context/README.md
+  - context/engineering-context/index.md
   - specs/README.md
 tests:
   - tests/unit/ship.test.js
@@ -47,6 +47,7 @@ tests:
   - tests/unit/qa-facts.test.js
   - tests/unit/agent-summary.test.js
   - tests/unit/demo-transcript.test.js
+  - tests/unit/winnow-record.test.js
   - tests/unit/ship-progress.test.js
   - tests/unit/ai-cost.test.js
 related: [testing]
@@ -69,7 +70,7 @@ headless — and `--allowedTools` including `Workflow`; phase agents inherit the
 rest — `/ship <n> --sized`, since a run with no size flag is fast. On a laptop
 it is `/ship <n>`, and asked from a chat the session first asks which of the
 four runs (CLAUDE.md). There is no `/build`: the
-step-by-step detail lives in `docs/harness/ship-playbook.md`, a plain doc the
+step-by-step detail lives in `context/engineering-context/harness/ship-playbook.md`, a plain doc the
 phase prompts point at by section, so it cannot be run on its own.
 
 `code-review.js` and `qa.js` take a PR number, or `{ pr, workdir }` on a
@@ -101,7 +102,7 @@ cover) → none. Where it cannot tell, fast falls back to the branch's own
 specs and `tests/smoke.spec.js` (`fastFallback`), which opens every page;
 the whole suite goes to a change to what runs the tests (the Playwright or Vite
 config, `package.json`, `index.html`, `gate.mjs`) and to any file outside
-`src/`, `server/`, `tests/`, `docs/`, `specs/`, `.claude/` and `.github/` that
+`src/`, `server/`, `tests/`, `context/`, `specs/`, `.claude/` and `.github/` that
 is not Markdown (`public/`, `scripts/…`) — not to `tests/helpers.js`, where
 every new browser test adds its data lane. Fast's red-check runs with
 `RED_SCOPE=unit`: the branch's unit and API tests alone, the browser spec only
@@ -232,7 +233,7 @@ survived:
 - **`code-review.js`** — *Context* (the PR, its Done-when, and human comments
   that amend the ticket) → lenses in parallel, chosen by `kindsOf(files)`:
   app code gets `criteria, rules, logic, tests`; `.github/workflows/` adds
-  `actions`; CLAUDE.md, `docs/`, skills and specs add `docs` (docs-truth);
+  `actions`; CLAUDE.md, `context/`, skills and specs add `docs` (docs-truth);
   `.claude/workflows/`, `.claude/agents/`, `.claude/settings.json` and every
   `scripts/` file add `orchestration, logic, tests`. Each is retried once if it dies → a `skeptic` per blocker, who alone
   sees the amendments → *Publish*. Confidence is the weakest lens's; a lens
@@ -342,7 +343,7 @@ is a no-op, and the script never queues it.
 `learn-escape.yml`: an agent on Sonnet decides whether the mistake recurs on
 other tickets and, if so, opens a pull request teaching the harness where it
 would have been caught — preferring an audit rule in `ship.js` over a
-`docs/context` gotcha, and naming any mechanical check it would take. A person
+`context/engineering-context` gotcha, and naming any mechanical check it would take. A person
 merges the lesson or not. Its own PR is on a `learn/…` branch, so its reviews
 cannot start another round.
 
@@ -364,7 +365,7 @@ cannot start another round.
   runs `scripts/depends.mjs <n>`: it reads the `**Depends on:** #m` line
   create-tasks writes and asks GitHub whether each issue is closed as
   completed. All done → build on main. One not done but being built (an open
-  pull request, or an `issue-<m>-` branch) → **stack**: `BASE` becomes that
+  pull request, or an `issue-<m>-` branch; `#m` may itself be an open, non-draft, same-repository pull request, stacked on by its head branch whatever it is named; a merged one is done) → **stack**: `BASE` becomes that
   branch, so the worktree, every gate's merge and the pull request's base all
   use it, and the PR body says *Stacked on #pr — merge that first*. In a batch
   (`/ship 2 3`, `args.batch`) it waits up to five minutes for a dependency's
@@ -566,7 +567,7 @@ cannot start another round.
   machine check, and waiting on `verify.yml` would mostly wait on the
   *Approve and run* click a bot's pull request needs.
 - **Docs move with the code, inside ship.** There is no Context agent: the
-  implementer and each fixer update the `docs/context/` docs that own what they
+  implementer and each fixer update the `context/engineering-context/` docs that own what they
   changed (and the spec, when a finding shows it wrong), and the combined code
   auditor flags a doc left describing the code wrongly (`docs-stale`). A
   separate agent re-learnt the whole change to move a line or two — ~400k
@@ -586,7 +587,7 @@ cannot start another round.
 - What an auditor looks for → `CODE_LENSES` / `SPEC_LENSES` in `ship.js`; the
   detail they defer to lives in the code-review and qa playbooks.
 - The PR body → §8 of the playbook; `ship.js` only adds the audit table.
-- The context format → `docs/context/README.md` and `scripts/context.mjs`.
+- The context format → `context/engineering-context/index.md` and `scripts/context.mjs`.
 
 ## AI spend
 
@@ -621,4 +622,4 @@ conclusion `success`): it checks out the verified `head_sha` and runs
 it is unset. `--ci` returns when the *build* ends, so a second step polls
 `railway deployment list` for the deployment the upload created (found by
 diffing ids recorded before it) until `SUCCESS`, and fails on a bad status or
-after 15 minutes. The secret and variable are in `docs/harness/github.md`.
+after 15 minutes. The secret and variable are in `context/engineering-context/harness/github.md`.

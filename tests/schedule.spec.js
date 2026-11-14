@@ -104,7 +104,7 @@ test.describe('Schedule', () => {
     await visit(page, `/schedule?day=${day}&view=list`);
     await waitForResults(page);
     // Mobile keeps the rail behind the Filters button.
-    const filters = page.getByRole('button', { name: 'Filters' });
+    const filters = page.getByRole('button', { name: 'Filters', exact: true });
     const open = async () => { if (await filters.isVisible()) await filters.click(); };
     const pill = (t) => page.getByRole('button', { name: t.shortName ?? t.name, exact: true });
     const total = (n) => expect(page.getByTestId('result-count')).toHaveText(`${n} ${n === 1 ? 'session' : 'sessions'}`);
@@ -113,7 +113,6 @@ test.describe('Schedule', () => {
     await pill(t1).click();
     await expect(pill(t1)).toHaveAttribute('aria-pressed', 'true');
     await total(await count(t1.slug));
-
     await open();
     await pill(t2).click();
     await expect(pill(t2)).toHaveAttribute('aria-pressed', 'true');

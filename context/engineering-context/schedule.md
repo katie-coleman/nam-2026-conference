@@ -11,6 +11,7 @@ files:
   - server/routes/sessions.js
 tests:
   - tests/schedule.spec.js
+  - tests/api/sessions-tracks.test.js
   - tests/session.spec.js
 related: [seats, attendance, agenda, venues, speakers, ui, clock]
 ---
@@ -29,7 +30,7 @@ and a bound `?` to `args`:
 | param | clause |
 | --- | --- |
 | `day` | `s.day = ?` |
-| `trackSlug` | `t.slug = ?` |
+| `trackSlug` | `t.slug IN (?, …)` — comma-separated, trimmed, empties dropped; one slug is the old `= ?` |
 | `venueId` / `roomId` | `v.id = ?` / `r.id = ?` |
 | `level` / `format` | `s.level = ?` / `s.format = ?` |
 | `q` | `LIKE %q%` on title, abstract, subtitle, or any speaker name (`EXISTS`) |
@@ -56,6 +57,10 @@ lists are plain `toSession` — no speakers/tags. **`/:id.ics`** is registered
 Page keys map to API keys in the `useFetch` call (`track→trackSlug`,
 `venue→venueId`, `tag→tagSlug`). `set(key, value)` deletes the key for `'all'`/empty
 and writes with `{ replace: true }`; `clearAll` keeps `day` and an explicit `view`.
+`track` is multi-valued: `filters.track` is the raw comma string, `selectedTracks`
+is its split, and the pills (`aria-pressed`) call `toggleTrack`, which writes
+`?track=a,b` with literal commas (not `%2C`); `All` clears it. Any selected track
+is still one `BLOCKERS` entry, so the Grid tab is disabled.
 The empty state's heading is `No sessions match`, followed by the search text in curly quotes when `q` is set.
 
 **Grid vs list.** `requestedView = ?view ?? (useMediaQuery('(min-width: 1024px)') ? 'grid' : 'list')`.

@@ -91,6 +91,49 @@ test.describe('Schedule', () => {
     await expect(page.getByRole('heading', { name: 'No sessions match', exact: true })).toBeVisible();
   });
 
+  test('track pills toggle several tracks at once', async ({ page, request }) => {
+    const days = await conferenceDays();
+    const { tracks } = await (await request.get(`${API}/bootstrap`)).json();
+    const day = days[1];
+    const count = async (slug) => {
+      const q = slug ? `&trackSlug=${slug}` : '';
+      const r = await (await request.get(`${API}/sessions?day=${day}${q}`)).json();
+      return (Array.isArray(r) ? r : r.sessions).length;
+    };
+    const [t1, t2] = tracks;
+    await visit(page, `/schedule?day=${day}&view=list`);
+    await waitForResults(page);
+    // Mobile keeps the rail behind the Filters button.
+    const filters = page.getByRole('button', { name: 'Filters', exact: true });
+    const open = async () => { if (await filters.isVisible()) await filters.click(); };
+    const pill = (t) => page.getByRole('button', { name: t.shortName ?? t.name, exact: true });
+    const total = (n) => expect(page.getByTestId('result-count')).toHaveText(`${n} ${n === 1 ? 'session' : 'sessions'}`);
+
+    await open();
+    await pill(t1).click();
+    await expect(pill(t1)).toHaveAttribute('aria-pressed', 'true');
+    await total(await count(t1.slug));
+    await open();
+    await pill(t2).click();
+    await expect(pill(t2)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page).toHaveURL(new RegExp(`track=${t1.slug},${t2.slug}`));
+    await total(await count(`${t1.slug},${t2.slug}`));
+    await expect(page.getByTestId('view-grid')).toBeDisabled();
+    await expect(page.getByTestId('view-grid')).toHaveAttribute('title', /track filter/);
+    await shotForPR(page, 'two tracks selected in the schedule filter');
+
+    await open();
+    await pill(t2).click();
+    await expect(pill(t2)).toHaveAttribute('aria-pressed', 'false');
+    await expect(page).toHaveURL(new RegExp(`track=${t1.slug}(&|$)`));
+    await total(await count(t1.slug));
+
+    await open();
+    await pill(t1).click();
+    await expect(page).not.toHaveURL(/track=/);
+    await total(await count(''));
+  });
+
   test('Clear filters clears the search and brings sessions back', async ({ page }) => {
     await visit(page, '/schedule?q=zzqx&view=list');
     await page.getByRole('button', { name: 'Clear filters' }).click();
